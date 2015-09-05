@@ -505,7 +505,11 @@ will serve us well throughout this course.
     ```
     
     ```{r}
-    wdw <- ggplot(data=cdc) + geom_point(aes(x=weight, y=wtdesire)) + myTheme
+    # Visualize and include a line representing 0 diff (wtdesire = weight)
+    wdw <- ggplot(data=cdc) + 
+      geom_point(aes(x=weight, y=wtdesire), alpha = 2/10, colour="darkblue") + 
+      geom_abline(intercept=0, slope=1, colour="lightblue") + 
+      myTheme
     wdw
     # Compare desired weight to weigth and show more people desire 
     # a lower weight than they currently report.
