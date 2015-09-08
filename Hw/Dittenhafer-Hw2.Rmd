@@ -5,9 +5,55 @@ date: "September 13, 2015"
 output: pdf_document
 ---
 
-### 2.6 ??? (p??)
+### 2.6 Dice rolls (p116)
 
-### 2.8 ??? (p??)
+If you roll a pair of fair dice, what is the probability of:
+
+Assuming: 
+
+* Six sided dice
+* Values 1 - 6 (no zero)
+
+#### a. getting a sum of 1?
+
+The minimum sum from a pair of dice, given the assumptions above, would be 2. Since a sum of 1 is not part of the set of outcomes, the probability would be 0.
+
+#### b. getting a sum of 5?
+
+How many ways can a sum of 5 be the result of 2 dice?
+
+Roll  |1|2|3|4
+------|-|-|-|-
+die 1 |1|2|3|4
+die 2 |4|3|2|1
+
+There are 4 outcomes which can result in a sum of 5, and 36 total outcomes possible (6 X 6), therefore the probability is \(\frac{4}{36}=\frac{1}{9}\approx`r 1/9`\) 
+
+#### c. getting a sum of 12?
+
+There is only on outcome from 2 dice which sum to 12: a 6 and 6 (boxcars). As such, the probablity is:
+
+\(\frac{1}{36}\approx`r 1/36`\)
+
+
+### 2.8 Poverty and language (p117)
+
+#### a. Are living below the poverty line and speaking a foreign language at home disjoint?
+
+No. Specifcally, one could be living below the poverity line and speaking a foreign language at home,
+or one could living below the poverty line only, or speaking a foreign language at home only. In the case described in the question, 4.2% fall into both categories.
+
+#### b. Draw a venn diagram summarizing the varibles and their associated probabilities.
+
+```{r}
+library(VennDiagram)
+
+draw.pairwise.venn(14.6-4.2, 
+                   20.7-4.2,
+                   cross.area=4.2, 
+                   c("Poverty", "Foreign Lang"), fill=c("pink", "lightblue"))
+```
+
 
 ### 2.20 ??? (p??)
 
