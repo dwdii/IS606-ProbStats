@@ -45,17 +45,95 @@ or one could living below the poverty line only, or speaking a foreign language 
 
 #### b. Draw a venn diagram summarizing the varibles and their associated probabilities.
 
+The R code segment below shows using the `VennDiagram` package to create a Venn diagram for the variables and probabilities desribed in the exercise description:
+
 ```{r}
 library(VennDiagram)
+pov <- 14.6
+forLang <- 20.7
+both <- 4.2
+povOnly <- pov - both
+forLangOnly <- forLang - both
 
-draw.pairwise.venn(14.6-4.2, 
-                   20.7-4.2,
-                   cross.area=4.2, 
-                   c("Poverty", "Foreign Lang"), fill=c("pink", "lightblue"))
+venn.plot <- draw.pairwise.venn(pov, 
+                   forLang,
+                   cross.area=both, 
+                   c("Poverty", "Foreign Language"), 
+                   fill=c("pink", "lightblue"),
+                   cat.dist=-0.08,
+                   ind=FALSE)
+grid.draw(venn.plot)
+```
+
+#### c. What percent of Americans live below the poverty line and only speak English at home?
+
+Based on the results of the Venn diagram, `r povOnly`% of American live below the poverty line and only speak English at home.
+
+#### d. What percent of Americans live below the poverty line or speak a foreign language at home?
+
+Using the General Addition Rule from the text, where P(A or B) = P(A) + P(B) - P(A and B), then:
+
+\(`r forLang` + `r pov` - `r both` = `r forLang + pov - both`\)
+
+#### e. What percent of Americans live above the poverty line and only speak English at home?
+
+P(1 - PovOnly) = `r 1 - (povOnly) / 100`
+
+#### f. Is the event that someone lives below the poverty line independent of the event that the person speaks a foreign language at home?
+
+Using the test of the Multiplication Rule for independent events (p86,87), do poverty and language satisfy the rule:
+
+P(A and B) = P(A) x P(B)
+
+\(`r pov / 100` \times `r forLang / 100` = `r (pov/100) * (forLang/100) `\)
+
+This is not equal to `r both / 100 `, therefore it fails the Multiplication Rule for independent events test - the events are not independent.
+
+
+### 2.20 Assortative mating (p121)
+
+#### a. What is the probability that a randomly chosen male respondent or his partner has blue eyes?
+
+This is not a disjoint event, because there is a scenario when both the male and partner have blue eyes. There are 108 females in the study with blue eyes, and another 114 males with blue eyes, with 78 where male and partner have blue eyes, out of a total of 204 couples in the study. 
+
+P(Male Blue or Partner Blue) \(=\frac{114}{204}+\frac{108}{204}-\frac{78}{204}=`r ((114+108)/204) - (78/204)`\)
+
+#### b. What is the probability that a randomly chosen male respondent with blue eyes has a partner with blue eyes? 
+
+My initial interpretation of this question was as P(Male Blue and Partner Blue):
+
+P(Blue and Blue) \(=\frac{78}{204}=`r (78/204)`\)
+
+Revisiting this answer, when interpreted as P(Partner Blue given Male Blue):
+
+P(Partner Blue given Male Blue) \(=\frac{78}{114}=`r (78/114)`\)
+
+#### c. What is the probability that a randomly chosen male respondent with brown eyes has a partner with blue eyes? Green eyes and blue eyes? 
+
+This sounds like the question is P(Partner Blue given Male Brown), and P(Partner Blue given Male Green). Thinking in this way:
+
+P(Partner Blue given Male Brown) \(=\frac{19}{54}=`r (19/54)`\)
+
+P(Partner Blue given Male Green) \(=\frac{11}{36}=`r (11/36)`\)
+
+#### d. Does it appear that the eye color of male respondents and their partners are independent? Explain your reasoning.
+
+Looking at proportions by male eye color, there is definitely an affinity to selecting a partner with the same eye color. Given this analysis, the eye color of male respondents and their partners does not appear to be independent.
+
+```{r}
+fBlue <- c(78,19,11)
+fBrown <- c(23,23,9)
+fGreen <- c(13,12,16)
+df <- data.frame(fBlue, fBrown, fGreen)
+row.names(df) <- c("mBlue", "mBrown", "mGreen")
+df$sum <- c(sum(df["mBlue",]), sum(df["mBrown",]), sum(df["mGreen",]))
+
+dfProp <- df / df$sum
+dfProp
 ```
 
 
-### 2.20 ??? (p??)
+
 
 ### 2.30 ??? (p??)
 
