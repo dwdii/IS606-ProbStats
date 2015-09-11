@@ -43,11 +43,11 @@ There is only on outcome from 2 dice which sum to 12: a 6 and 6 (boxcars). As su
 No. Specifcally, one could be living below the poverity line and speaking a foreign language at home,
 or one could living below the poverty line only, or speaking a foreign language at home only. In the case described in the question, 4.2% fall into both categories.
 
-#### b. Draw a venn diagram summarizing the varibles and their associated probabilities.
+#### b. Draw a venn diagram summarizing the variables and their associated probabilities.
 
 The R code segment below shows using the `VennDiagram` package to create a Venn diagram for the variables and probabilities desribed in the exercise description:
 
-```{r}
+```{r, message=FALSE}
 library(VennDiagram)
 pov <- 14.6
 forLang <- 20.7
@@ -73,11 +73,12 @@ Based on the results of the Venn diagram, `r povOnly`% of American live below th
 
 Using the General Addition Rule from the text, where P(A or B) = P(A) + P(B) - P(A and B), then:
 
-\(`r forLang` + `r pov` - `r both` = `r forLang + pov - both`\)
+\(`r forLang` + `r pov` - `r both` = `r forLang + pov - both`\)%
 
 #### e. What percent of Americans live above the poverty line and only speak English at home?
 
-P(1 - PovOnly) = `r 1 - (povOnly) / 100`
+`r 100 - forLang`% English-speaking Americans - `r povOnly` English speaking Americans in Povery = `r 100 - forLang - povOnly`% Americans living above poverty line and only speak English at home.
+
 
 #### f. Is the event that someone lives below the poverty line independent of the event that the person speaks a foreign language at home?
 
@@ -87,7 +88,7 @@ P(A and B) = P(A) x P(B)
 
 \(`r pov / 100` \times `r forLang / 100` = `r (pov/100) * (forLang/100) `\)
 
-This is not equal to `r both / 100 `, therefore it fails the Multiplication Rule for independent events test - the events are not independent.
+This is not equal to `r both / 100 `, therefore it fails the Multiplication Rule for independent events test - the events are not independent and therefore knowing information about one of the events does provide information about the outcome of the other event.
 
 
 ### 2.20 Assortative mating (p121)
@@ -135,8 +136,102 @@ dfProp
 
 
 
-### 2.30 ??? (p??)
+### 2.30 Books on a bookshelf (p123)
 
-### 2.38 ??? (p??)
+The table below shows the distribution of books on a bookcase:
 
-### 2.44 ??? (p??)
+
+Type/Format|Hardcover|Paperback|Total|
+-----------|---------|---------|-----|
+Fiction    | 13      | 59      | 72  |
+Nonfiction | 15      | 8       | 23  |
+Total      | 28      | 67      | 95  |
+
+
+#### a. Find the probability of drawing a hardcover book first then a paperback fiction book second when drawing without replacement. 
+
+First we identify the marginal probability for Hardcover:
+
+P(Hardcover) \(=\frac{28}{95}=`r 28/95`\)
+
+Then the joint probability of paperback fiction (w/o replacement):
+
+P(Paperback Fiction) \(=\frac{59}{94}=`r 59/94`\)
+
+P(Hardcover and Paperback Fiction) \(=`r 28/95` \times `r 59/94`=`r (28/95)*(59/94)`\)
+
+#### b. Determine the probability of drawing a fiction book first and then a hardcover book second when drawing without replacement.
+
+First we identify the marginal probability for Fiction:
+
+P(Fiction) \(=\frac{72}{95}=`r 72/95`\)
+
+Then the marginal probability of hardcover fiction (w/o replacement):
+
+P(Hardcover) \(=\frac{28}{94}=`r 28/94`\)
+
+P(Fiction and Hardcover) \(=`r 72/95` \times `r 28/94`=`r (72/95)*(28/94)`\)
+
+#### c. Calculate the probability of the scenario in part (b), except this time complete the calculations under the scenario where the first book is placed back on the bookcase before randomly drawing the second book.
+
+We know the marginal probability for Fiction:
+
+P(Fiction) \(=\frac{72}{95}=`r 72/95`\)
+
+But now the marginal probability of hardcover fiction is based on replacement:
+
+P(Hardcover) \(=\frac{28}{95}=`r 28/95`\)
+
+P(Fiction and Hardcover) \(=`r 72/95` \times `r 28/95`=`r (72/95)*(28/95)`\)
+
+#### d. The final ansewrs to parts (b) and (c) are very similar. Explain why this is the case.
+
+The probabilities are very similar because the marginal probabilities that go into the result are also very similar. The only difference is the replacement which simply changes the denominator of the second book selection by 1. Given the number of books on the bookcase (94 vs 95), replacement has very little effect initally. On the other hand, after removing 90 books from the self, replacement (or not) would have a significant effect.
+
+### 2.38 Baggage fees (p124)
+
+An airline changes the following baggage fees: $25 for the first bag and $35 for the second. Suppose 54% of passengers have no checked baggage, 34% have one piece of checked luggage, and 12% have two pieces. We suppose a negligible portion of people check more than two bags.
+
+#### a. Build a probability model, compute the average revenue per passenger, and compute the corresponding standard deviation.
+
+```{r}
+prob <- c(0.54, 0.34, 0.12)
+bags <- c(0, 1, 2)
+fees <- c(0, 25, 25 + 35)
+df38 <- data.frame(prob, bags, fees)
+df38$weightRev <- df38$prob * df38$fees
+df38
+# Compute the average revenue per passenger
+avgRevPerPax <- sum(df38$weightRev)
+avgRevPerPax
+# Compute Variance
+df38$DiffMean <- df38$weightRev - avgRevPerPax
+df38$DiffMeanSqrd <- df38$DiffMean ^ 2
+df38$DiffMeanSqrdTimesProb <- df38$DiffMeanSqrd * df38$prob
+df38
+# Compute standard deviation
+varRevPerPax <- sum(df38$DiffMeanSqrdTimesProb)
+sdRevPerPax <- sqrt(varRevPerPax)
+sdRevPerPax
+```
+
+#### b. About how much revenue should the airline expect for a flight of 120 passengers? With what standard deviation? Note any assumptions you make and if you think they are justified.
+
+The following R code computes the revenue for a flight of 120 passengers:
+
+```{r}
+pax <- 120
+avgFlightRev <- avgRevPerPax * pax
+avgFlightRev
+
+# Standard Deviation
+varFlightRev <- (pax ^ 2) * varRevPerPax
+sdFlightRev <- sqrt(varFlightRev)
+sdFlightRev
+```
+
+The standard deviation of the average revenue for the flight is valid only if the average revenue per passenger is independent of other random variables. Given that this is the only random variable, independence is not an issue.
+
+### 2.44 Income and gender (p126)
+
+
