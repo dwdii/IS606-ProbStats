@@ -4,6 +4,14 @@ author: "Daniel Dittenhafer"
 date: "September 13, 2015"
 output: pdf_document
 ---
+```{r, echo=FALSE} 
+library(ggplot2)
+myTheme <- theme(axis.ticks=element_blank(),  
+                  panel.border = element_rect(color="gray", fill=NA), 
+                  panel.background=element_rect(fill="#FBFBFB"), 
+                  panel.grid.major.y=element_line(color="white", size=0.5), 
+                  panel.grid.major.x=element_line(color="white", size=0.5))
+```
 
 ### 2.6 Dice rolls (p116)
 
@@ -234,4 +242,51 @@ The standard deviation of the average revenue for the flight is valid only if th
 
 ### 2.44 Income and gender (p126)
 
+59% males, 41% females
+
+Income             | Total
+-------------------|------
+$1 - $9,999        | 2.2%
+$10,000 to $14,999 | 4.7
+$15,000 to $24,999 | 15.8
+
+```{r}
+income <- c("$1 - $9,999 or loss", 
+            "$10,000 to $14,999", 
+            "$15,000 to $24,999",
+            "$25,000 to $34,999",
+            "$35,000 to $49,999",
+            "$50,000 to $64,000",
+            "$65,000 to $74,999",
+            "$75,000 to $99,999",
+            "$100,000 or more")
+total <- c(0.022, 0.047, 0.158, 0.183, 0.212, 0.139, 0.058, 0.084, 0.097)
+
+df44 <- data.frame(income, total)
+df44
+```
+
+#### a. Describe the distribution of total personal income.
+
+Ploting the points below, the visualization shows a concept of the distribution. The distribution is
+bimodel and somewhat skewed to left.
+
+```{r, echo=FALSE}
+g44 <- ggplot(data=df44) + 
+  geom_point(aes(x=income, y=total)) + 
+  myTheme + 
+  theme(axis.text.x = element_text(angle=45, vjust=1, hjust=1))
+g44
+```
+
+#### b. What is the probability that a randomly chosen US resident makes less than $50,000 per year?
+
+By summing the percentages from the data for the disjoint, mutually exclusive outcomes of each income level, we can determine the total probability:
+
+```{r}
+pr50K <- sum(df44[1:5,]$total)
+pr50K
+```
+
+#### c. What is the probability that a randomly chosen US resident makes less than $50,000 per year and is female? Note any assumptions you make.
 
