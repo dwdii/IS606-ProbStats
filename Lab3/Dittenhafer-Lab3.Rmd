@@ -1,11 +1,20 @@
 ---
 title: "The normal distribution"
 output:
+  pdf_document: default
   html_document:
-    theme: cerulean
-    highlight: pygments
     css: ./lab.css
+    highlight: pygments
+    theme: cerulean
 ---
+```{r, echo=FALSE} 
+library(ggplot2)
+myTheme <- theme(axis.ticks=element_blank(),  
+                  panel.border = element_rect(color="gray", fill=NA), 
+                  panel.background=element_rect(fill="#FBFBFB"), 
+                  panel.grid.major.y=element_line(color="white", size=0.5), 
+                  panel.grid.major.x=element_line(color="white", size=0.5))
+```
 
 In this lab we'll investigate the probability distribution that is most central
 to statistics: the normal distribution.  If we are confident that our data are 
@@ -19,13 +28,13 @@ This week we'll be working with measurements of body dimensions.  This data set
 contains measurements from 247 men and 260 women, most of whom were considered 
 healthy young adults.
 
-```{r load-data, eval=FALSE}
+```{r load-data, eval=TRUE}
 load("more/bdims.RData")
 ```
 
 Let's take a quick peek at the first few rows of the data.
 
-```{r head-data, eval=FALSE}
+```{r head-data, eval=TRUE}
 head(bdims)
 ```
 
@@ -39,13 +48,38 @@ Since males and females tend to have different body dimensions, it will be
 useful to create two additional data sets: one with only men and another with 
 only women.
 
-```{r male-female, eval=FALSE}
+```{r male-female, eval=TRUE}
 mdims <- subset(bdims, sex == 1)
 fdims <- subset(bdims, sex == 0)
 ```
 
 1.  Make a histogram of men's heights and a histogram of women's heights.  How 
     would you compare the various aspects of the two distributions?
+    
+    ```{r}
+    g1 <- ggplot(data=mdims) + geom_bar(aes(x=hgt)) +
+            myTheme +
+            labs(title="Men's Height Distribution", x="Height (cm)")
+    g1
+  
+    g2 <- ggplot(data=fdims) + geom_bar(aes(x=hgt)) +
+            myTheme +
+            labs(title="Women's Height Distribution", x="Height (cm)")
+    g2
+    
+    g3m <- ggplot() + 
+            geom_bar(data=mdims, aes(x=(hgt %% 2) == 0), colour="lightblue", position="dodge") +
+            myTheme +
+            labs(title="Even vs Odd Heights", x="")
+    g3m
+    
+    g3f <- ggplot() + 
+            geom_bar(data=fdims, aes(x=(hgt %% 2) == 0), colour="pink", position=position_dodge(width=1)) +
+            myTheme +
+            labs(title="Even vs Odd Heights", x="")
+    g3f
+
+    ```
 
 ## The normal distribution
 
