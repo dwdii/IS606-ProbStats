@@ -56,29 +56,35 @@ fdims <- subset(bdims, sex == 0)
 1.  Make a histogram of men's heights and a histogram of women's heights.  How 
     would you compare the various aspects of the two distributions?
     
-    ```{r}
-    g1 <- ggplot(data=mdims) + geom_bar(aes(x=hgt)) +
+    **The histogram for men's and women's heighs are shown below. THe distributions are similar is several
+    ways such as they both are multi-model and mostly balanced with no significant skew. It is interesting
+    to see the peaks around the even numbers for women between between 160 - 170cm .**
+    
+    ```{r, echo=FALSE, messages=FALSE}
+    g1 <- ggplot(data=mdims) + geom_bar(aes(x=hgt), binwidth=1) +
             myTheme +
             labs(title="Men's Height Distribution", x="Height (cm)")
     g1
   
-    g2 <- ggplot(data=fdims) + geom_bar(aes(x=hgt)) +
+    g2 <- ggplot(data=fdims) + geom_bar(aes(x=hgt), binwidth=1) +
             myTheme +
             labs(title="Women's Height Distribution", x="Height (cm)")
     g2
     
-    g3m <- ggplot() + 
-            geom_bar(data=mdims, aes(x=(hgt %% 2) == 0), colour="lightblue", position="dodge") +
-            myTheme +
-            labs(title="Even vs Odd Heights", x="")
-    g3m
-    
-    g3f <- ggplot() + 
-            geom_bar(data=fdims, aes(x=(hgt %% 2) == 0), colour="pink", position=position_dodge(width=1)) +
-            myTheme +
-            labs(title="Even vs Odd Heights", x="")
-    g3f
-
+    # Create a data.frame with boolean indicating whether 
+    # the height is even (TRUE) or odd (FALSE)
+#     df <- data.frame()
+#     df <- rbind(df, cbind(rep("male", nrow(mdims)), (mdims$hgt %% 0.2) == 0 ,  mdims$hgt))
+#     df <- rbind(df, cbind(rep("female", nrow(fdims)), (fdims$hgt %% 0.2) == 0, fdims$hgt))
+#     colnames(df) <- c("gender", "heightEven")
+#     head(df)
+#     
+#     g3m <- ggplot() + 
+#             geom_bar(data=df, aes(x=heightEven, group=gender, fill=gender), position="dodge") +
+#             myTheme +
+#             scale_fill_manual(values=c("lightblue", "pink")) +
+#             labs(title="Even Heights", x="Height is Even (vs Odd)")
+#     g3m
     ```
 
 ## The normal distribution
@@ -93,7 +99,7 @@ This normal curve should have the same mean and standard deviation as the data.
 We'll be working with women's heights, so let's store them as a separate object 
 and then calculate some statistics that will be referenced later. 
 
-```{r female-hgt-mean-sd, eval=FALSE}
+```{r female-hgt-mean-sd, eval=TRUE}
 fhgtmean <- mean(fdims$hgt)
 fhgtsd   <- sd(fdims$hgt)
 ```
@@ -110,11 +116,23 @@ Frequency and density histograms both display the same exact shape; they only
 differ in their y-axis. You can verify this by comparing the frequency histogram 
 you constructed earlier and the density histogram created by the commands below.
 
-```{r hist-height, eval=FALSE}
+```{r hist-height, eval=TRUE}
 hist(fdims$hgt, probability = TRUE)
 x <- 140:190
 y <- dnorm(x = x, mean = fhgtmean, sd = fhgtsd)
 lines(x = x, y = y, col = "blue")
+```
+
+```{r, eval=FALSE, echo=FALSE}
+    g2 <- ggplot(data=fdims, aes(x=hgt)) + geom_histogram(binwidth=5) +
+            stat_function(fun=function(x, mean, sd, n){ 
+                        n * dnorm(x = x, mean = mean, sd = sd) 
+                }, color="lightgreen", 
+                          args = c(mean = fhgtmean, sd = fhgtsd, n=length(fdims$hgt))) +
+            scale_x_continuous("Height (cm)") +
+            myTheme +
+            labs(title="Women's Height Distribution + Normal", x="Height (cm)")
+    g2
 ```
 
 After plotting the density histogram with the first command, we create the x- 
@@ -132,6 +150,9 @@ the histogram function: `ylim = c(0, 0.06)`.
 
 2.  Based on the this plot, does it appear that the data follow a nearly normal 
     distribution?
+    
+    **Based on the plot binned by 5cm buckets, it does appear the data follow a nearly normal
+    distribution.**
 
 
 ## Evaluating the normal distribution
@@ -142,7 +163,7 @@ close the histogram is to the curve. An alternative approach involves
 constructing a normal probability plot, also called a normal Q-Q plot for 
 "quantile-quantile".
 
-```{r qq, eval=FALSE}
+```{r qq, eval=TRUE}
 qqnorm(fdims$hgt)
 qqline(fdims$hgt)
 ```
@@ -158,7 +179,7 @@ A useful way to address this question is to rephrase it as: what do probability
 plots look like for data that I *know* came from a normal distribution?  We can 
 answer this by simulating data from a normal distribution using `rnorm`.
 
-```{r sim-norm, eval=FALSE}
+```{r sim-norm, eval=TRUE}
 sim_norm <- rnorm(n = length(fdims$hgt), mean = fhgtmean, sd = fhgtsd)
 ```
 
@@ -172,6 +193,11 @@ as well as its normal probability plot.
 3.  Make a normal probability plot of `sim_norm`.  Do all of the points fall on 
     the line?  How does this plot compare to the probability plot for the real 
     data?
+    
+    ```{r qqSim, eval=TRUE}
+    qqnorm(sim_norm)
+    qqline(sim_norm)
+    ```
 
 Even better than comparing the original plot to a single plot generated from a 
 normal distribution is to compare it to many more plots using the following 
@@ -184,9 +210,20 @@ qqnormsim(fdims$hgt)
 4.  Does the normal probability plot for `fdims$hgt` look similar to the plots 
     created for the simulated data?  That is, do plots provide evidence that the
     female heights are nearly normal?
+    
+    **The normal probability plot does look similar to the simulated data plots. 
+    They both have "errant" points on the tails, through the similulated data
+    follows the line much more closely.**
 
 5.  Using the same technique, determine whether or not female weights appear to 
     come from a normal distribution.
+    
+    **Using the same technique, the weights are decently normal in the middle area, 
+    near the tails, particularlly the upper tail, some significant deviations.**
+    
+    ```{r qqnormsimWgt, eval=TRUE}
+    qqnormsim(fdims$wgt)
+    ```
 
 ## Normal probabilities
 
@@ -234,7 +271,32 @@ theoretical probabilities will be.
     those probabilities using both the theoretical normal distribution as well 
     as the empirical distribution (four probabilities in all).  Which variable,
     height or weight, had a closer agreement between the two methods?
-
+    
+    **What is the probability that a randomly chosen female is taller than 160cm?**
+    
+    ```{r}
+    p160Taller <- 1 - pnorm(q=160, mean = fhgtmean, sd = fhgtsd)
+    p160Taller
+    
+    p160TallerTheor <- sum(fdims$hgt > 160) / length(fdims$hgt)
+    p160TallerTheor
+    ```
+    
+    **What is the probability that a randomly chosen female weighs less than 75 kg?**
+    
+    ```{r}
+    fwhgtmean <- mean(fdims$wgt)
+    fwgtsd   <- sd(fdims$wgt)
+    pLighter <- pnorm(q=75, mean = fwhgtmean, sd = fwgtsd)
+    pLighter
+    
+    pLighterTheor <- sum(fdims$wgt < 75) / length(fdims$wgt)
+    pLighterTheor
+    ```
+    
+    **The weights had closer agreement on the probabilities, which tells me the middle section of the
+    qq plot is more important to be right on the line for matching normal distribution.**
+      
 * * *
 
 ## On Your Own
@@ -245,27 +307,41 @@ theoretical probabilities will be.
     (first subtract the mean, then divide by the standard deviation), so the 
     units won't be of any help.  If you are uncertain based on these figures, 
     generate the plots in R to check.
+    
+
 
     **a.** The histogram for female biiliac (pelvic) diameter (`bii.di`) belongs
-    to normal probability plot letter ____.
+    to normal probability plot letter __***B***__.
 
     **b.** The histogram for female elbow diameter (`elb.di`) belongs to normal 
-    probability plot letter ____.
+    probability plot letter __***C  ***__.
 
     **c.** The histogram for general age (`age`) belongs to normal probability 
-    plot letter ____.
+    plot letter __***D***__.
 
     **d.** The histogram for female chest depth (`che.de`) belongs to normal 
-    probability plot letter ____.
+    probability plot letter __***A***__.
 
 -   Note that normal probability plots C and D have a slight stepwise pattern.  
     Why do you think this is the case?
+    
+    **The steps seem to map to the transitions in the data from a particular percentile 
+    to the next one up (or down), versus the theoretical percentiles of the norm data.**
 
 -   As you can see, normal probability plots can be used both to assess 
     normality and visualize skewness.  Make a normal probability plot for female 
     knee diameter (`kne.di`).  Based on this normal probability plot, is this 
     variable left skewed, symmetric, or right skewed?  Use a histogram to confirm 
     your findings.
+    
+    **Based on the normal probability plot, it appears to be right skewed. The histogram agrees.**
+    
+    ```{r}
+    qqnorm(fdims$kne.di)
+    qqline(fdims$kne.di)
+    
+    hist(fdims$kne.di, probability = TRUE)
+    ```
 
 
 ![histQQmatch](more/histQQmatch.png)
