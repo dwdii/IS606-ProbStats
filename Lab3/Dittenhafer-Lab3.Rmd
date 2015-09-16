@@ -56,9 +56,9 @@ fdims <- subset(bdims, sex == 0)
 1.  Make a histogram of men's heights and a histogram of women's heights.  How 
     would you compare the various aspects of the two distributions?
     
-    **The histogram for men's and women's heighs are shown below. THe distributions are similar is several
-    ways such as they both are multi-model and mostly balanced with no significant skew. It is interesting
-    to see the peaks around the even numbers for women between between 160 - 170cm .**
+    **The histogram for men's and women's heighs are shown below. The distributions are similar is several
+    ways such as they both are multi-model and mostly balanced with no significant skew. There is a bell shape, 
+    though it isn't clear this data is normally distributed. It is interesting to see the peaks around the even   numbers for women between between 160 - 170cm .**
     
     ```{r, echo=FALSE, messages=FALSE}
     g1 <- ggplot(data=mdims) + geom_bar(aes(x=hgt), binwidth=1) +
@@ -193,6 +193,10 @@ as well as its normal probability plot.
 3.  Make a normal probability plot of `sim_norm`.  Do all of the points fall on 
     the line?  How does this plot compare to the probability plot for the real 
     data?
+    
+    **Many of the points lie on the line or very close to it.  The tails are the prime
+    difference between the two plots, but the real data points also have a step like 
+    behavior up the line.**
     
     ```{r qqSim, eval=TRUE}
     qqnorm(sim_norm)
