@@ -1,0 +1,152 @@
+---
+title: "3.1 Area Under the Curve"
+author: "Daniel Dittenhafer"
+date: "September 24, 2015"
+output:
+  ioslides_presentation:
+    smaller: true
+---
+```{r, echo=FALSE} 
+library(ggplot2)
+myTheme <- theme(axis.ticks=element_blank(),  
+                  panel.border = element_rect(color="gray", fill=NA), 
+                  panel.background=element_rect(fill="#FBFBFB"), 
+                  panel.grid.major.y=element_line(color="white", size=0.5), 
+                  panel.grid.major.x=element_line(color="white", size=0.5),
+                  plot.title=element_text(size="10"))
+```
+<style type="text/css">
+    ol { list-style-type: lower-alpha; }
+</style>
+
+## 3.1 Area Under the Curve
+
+What percent of a standard normal distribution \(N(\mu = 0, \sigma = 1)\) is found in each region? Be sure to draw a graph.
+
+a. Z < -1.35
+b. Z >  1.48
+c. -0.4 < Z < 1.5
+d. |Z| > 2
+
+## (a) Z < -1.35
+
+First, we define in `R` code the Z score and then use the `pnorm` function to determine the percentage on the left tail. 
+
+```{r}
+zLt <- -1.35
+pLt <- pnorm(zLt)
+pLt
+```
+
+
+## (a) Z < -1.35 Visualization
+
+The percent of the standard normal distribution found in the region Z < `r zLt` is `r round(pLt * 100, 2)`%.
+
+```{r, echo=FALSE}
+x <- seq(-4, 4, length=100)
+hx <- dnorm(x)
+df <- data.frame(x, hx)
+dfRegion <- df[df$x < zLt, ]
+
+g1 <- ggplot(data=df) + 
+  geom_line(aes(x=x, y=hx)) + 
+  geom_ribbon(data=dfRegion, aes(ymin=0, ymax=hx, x=x), fill="lightblue") +
+  labs(title="a) Region Less Than Z = -1.35", y="", x="") +
+  myTheme
+g1
+```
+
+## (b) Z >  1.48
+
+Again, we define in `R` code the Z score and then use the `pnorm` function to determine the percentage on the left tail. This time we subtract the value returned from `pnorm` from 1 to convert to the right tail value.
+
+```{r}
+zGt <- 1.48
+pGt <- 1 - pnorm(zGt)
+pGt
+```
+
+## (b) Z >  1.48 Visualization
+
+The percent of the standard normal distribution found in the region Z > `r zGt` is `r round(pGt * 100, 2)`%.
+
+```{r, echo=FALSE}
+x <- seq(-4, 4, length=100)
+hx <- dnorm(x)
+df <- data.frame(x, hx)
+dfRegion <- df[df$x > zGt, ]
+
+g1 <- ggplot(data=df) + 
+  geom_line(aes(x=x, y=hx)) + 
+  geom_ribbon(data=dfRegion, aes(ymin=0, ymax=hx, x=x), fill="lightblue") +
+  labs(title="b) Region Greater Than Z = 1.48", y="", x="") +
+  myTheme
+g1
+```
+
+## (c) -0.4 < Z < 1.5
+
+Again, we define in `R` code the Z scores and use `pnorm`. This time we have a middle region with a portion below zero and a portion above zero, therefore we substract using 0.5 depending on which side we are on.
+
+```{r}
+z1 <- -0.4
+p1 <- 0.5 - pnorm(z1) # Left of mean 0
+
+z2 <- 1.5
+p2 <- pnorm(z2) - 0.5 # Right of mean 0
+
+pT <- p1 + p2
+pT
+```
+
+## (c) -0.4 < Z < 1.5 Visualization
+
+The percent of the standard normal distribution found in the region -0.4 < Z < 1.5 is `r round(pT * 100, 2)`%.
+
+```{r, echo=FALSE}
+x <- seq(-4, 4, length=100)
+hx <- dnorm(x)
+df <- data.frame(x, hx)
+dfRegion <- df[z1 < df$x & df$x < z2, ]
+
+g1 <- ggplot(data=df) + 
+  geom_line(aes(x=x, y=hx)) + 
+  geom_ribbon(data=dfRegion, aes(ymin=0, ymax=hx, x=x), fill="lightblue") +
+  labs(title="c) Region -0.4 < Z < 1.5", y="", x="") +
+  myTheme
+g1
+```
+
+## (d) Abs(Z) > 2
+
+Once again, we define in `R` code the Z score and use `pnorm`. We have a two separate tail regions with a portion below 0 and a portion above zero (not contiguous). In this case, the regions are identical due to the absolute value, therefore we can simply multiply by 2.
+
+```{r}
+z <- 2
+p1 <- 1 - pnorm(z) # Right tail
+
+pT <- 2 * p1
+pT
+```
+
+## (d) Abs(Z) > 2 Visualization
+
+The percent of the standard normal distribution found in the region \( |Z| > 2\) is `r round(pT * 100, 2)`%.
+
+```{r, echo=FALSE}
+x <- seq(-4, 4, length=500)
+hx <- dnorm(x)
+df <- data.frame(x, hx)
+dfRegionLeft <- df[df$x < (-1 * z), ]
+dfRegionRight <- df[z < df$x, ]
+
+g1 <- ggplot(data=df) + 
+  geom_line(aes(x=x, y=hx)) + 
+  geom_ribbon(data=dfRegionLeft, aes(ymin=0, ymax=hx, x=x), fill="lightblue") +
+  geom_ribbon(data=dfRegionRight, aes(ymin=0, ymax=hx, x=x), fill="lightblue") +
+  labs(title="d) Region |Z| > 2", y="", x="") +
+  myTheme
+g1
+```
+
