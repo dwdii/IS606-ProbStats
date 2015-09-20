@@ -1,7 +1,7 @@
 ---
 title: "Homework 3"
 author: "Daniel Dittenhafer"
-date: "September 19, 2015"
+date: "September 27, 2015"
 output: pdf_document
 ---
 ```{r, echo=FALSE} 
@@ -164,12 +164,178 @@ maryZc <- (maryTime - women3034mean) / women3034sd
 maryZc
 ```
 
+Leo's Z score is `r round(leoZc, 2)`, and Mary's Z score is `r round(maryZc, 2)`. These Z scores tell me how each of the participants faired in comparison to their respective groups.
 
+#### C) Did Leo or Mary rank better in their respective groups? Explain your reasoning.
 
-### 3.18  (p?)
+Mary did better than Leo in their respective groups. Although they are both finishing above the mean time, Mary was much closer to the women's mean than Leo was to the men's mean. Another way to look at this is Mary was much closer to the left tail (lower Z equates to lower finishing time).
 
-### 3.22  (p?)
+#### d) What percent of the triathletes did Leo finish faster than in his group?
 
-### 3.38  (p?)
+Using the `pnorm` function, we can determine the percent of triathletes who finished faster than Leo. By then taking the difference from 1 we can determine the percent of triathletes whom Leo's finished faster than. 
 
-### 3.42 (p?)
+```{r}
+pFasterThanLeo <- pnorm(leoZc)
+pFasterThanLeo
+
+pLeoFasterThan <- 1 - pFasterThanLeo 
+pLeoFasterThan
+```
+
+Leo finished faster than `r round(pLeoFasterThan * 100, 2)`% of the triathletes in his group.
+
+#### e) What percent of the triatheletes did Mary finish faster than in her group?
+
+Again, using the `pnorm` function, we can determine the percent of triathletes who finished faster than Mary. By then taking the difference from 1 we can determine the percent of triathletes whom Mary finished faster than. 
+
+```{r}
+pFasterThanMary <- pnorm(maryZc)
+pFasterThanMary
+
+pMaryFasterThan <- 1 - pFasterThanMary 
+pMaryFasterThan
+```
+
+Mary finished faster than `r round(pMaryFasterThan * 100, 2)`% of the triathletes in her group.
+
+#### f) If the distributions of finishing times are not nearly normal, would your answers to parts (b) - (e) change? Explain your reasoning.
+
+Most certainly the answers to parts (b) - (e) would change if the distribution of finishing times were not nearly normal. The Z scores and percentages are based on the area under the normal distribution curve. If the curve were not symmetric and were skewed to one side or the other, this would affect the area under the curve at any given finishing time value.
+
+### 3.18 Heights of femal college students (p161)
+
+```{r}
+heights <- c(54,55,56,56,57,58,58,59,60,60,60,61,61,62,62,63,63,63,64,65,65,67,67,69,73)
+dfHeights <- data.frame(heights)
+
+meanHeight <- mean(heights)
+meanHeight
+
+sdHeight <- sd(heights)
+sdHeight
+```
+
+#### a) Determine if the heights approximately follow the 68-95-99.7% Rule.
+
+We can check the data versus the normal 68-95-99.7% Rule by selecting out the values that fall into each range, and then divide the number of rows in the range by the total number of rows. To do this, I've defined a function `percentBySd` that we can use as a helper to compute the percentages through repeated calls.
+
+```{r}
+percentBySd <- function(data, numSd)
+{
+  m <- mean(data)
+  s <- sd(data)
+  
+  sd1Lower <- m - (s * numSd)
+  sd1Upper <- m + (s * numSd)
+  
+  sdData <- data[sd1Lower < data & data < sd1Upper]
+  pSdData <- length(sdData) / length(data)
+  return (pSdData)
+}
+# 1 Standard Deviation
+sd1 <- percentBySd(heights, 1) * 100
+# 2 Standard Deviation
+sd2 <- percentBySd(heights, 2) * 100
+# 3 Standard Deviation
+sd3 <- percentBySd(heights, 3) * 100
+sdList <- c(sd1, sd2, sd3)
+```
+
+It does appear that the height data basically follows the 68-95-99.7% Rule: `r sd1`-`r sd2`-`r sd3`.
+
+```{r, echo=FALSE}
+sdList
+```
+
+#### b) Do these data appear to follow the normal distribution? Explain your reasoning usign the graphs provided below.
+
+Based on the graphs in the text, the data roughly follows the normal distribution, but with a bit of skew. The best fit normal curve on the histogram is not a perfect fit, but it could be worse. Likewise, the normal probability plot generally follows the normal line, deviating mostly at the upper end.
+
+```{r, echo=FALSE}
+x <- seq(meanHeight - (sdHeight * 4), meanHeight + (sdHeight * 4), length=150)
+hx <- dnorm(x, mean=meanHeight, sd=sdHeight)
+dfNorm <- data.frame(x, hx=(hx * 120))
+
+g1 <- ggplot(data=dfHeights) + 
+  geom_bar(aes(x=heights), binwidth=4, fill="lightblue") + 
+  geom_line(data=dfNorm, aes(x=x, y=hx)) +
+  myTheme
+g1
+```
+
+### 3.22 Defective Rate  (p162)
+
+* 2% defective rate
+* Production is a random process
+* Each widget is independent of the others
+
+#### a) What is the probability that the 10th transistor produced is the first with a defect?
+
+Following the equation given on p143 of the text, \(p_n=(1-p)^{n-1} \times p\), written in `R` code, we have:
+
+```{r}
+defectRate <- 0.02
+successRate <-  1 - defectRate
+n <- 10
+
+p10 <- successRate^(n-1) * defectRate
+p10
+```
+
+The probability of the `r n`th transistor produced is the first with a defect is `r round(p10, 4)`.
+
+#### b) What is the probability that the machine produces no defective transistors in a batch of 100?
+
+We could look at this as asking what the probability is that a defective transitor will be produced in a batch of 100, and then take the complement. This would be P(n=1) + P(n=2) ...
+```{r}
+p100D <- 0
+for(i in 1:100)
+{
+  p100D <- p100D + (successRate^(i-1) * defectRate)
+}
+p100C <- 1 - p100D
+
+```
+
+The probability that the machine produces no defector transistors in a batch of 100 is `r round(p100C, 4)`.
+
+#### c) On average, how many transistors would you expect to be produced before the first with a defect? What is the standard deviation?
+
+Using the equation from p143 of the text, the follow `R` code computes the expected value and standard deviation:
+
+```{r}
+expectedVal <- 1 / defectRate
+expectedVal
+
+stdevDef <- sqrt( (1 - defectRate) / defectRate^2 )
+stdevDef
+```
+
+I would expect `r expectedVal` transistors to be produced before the first with a defect. The standard deviation is `r stdevDef`.
+
+#### d) Another machine that also produces transistors has a 5% defective rate where each transistor is produced independent of the others. On average how many transistors would you expect to be produced with this machine before the first with a defect? What is the standard deviation?
+
+Using the new defective rate, the follow computations, in `R` help use determine the expected value and standard deviation:
+
+```{r}
+defectRate <- 0.05
+successRate <-  1 - defectRate
+```
+
+```{r}
+expectedVal <- 1 / defectRate
+expectedVal
+
+stdevDef <- sqrt( (1 - defectRate) / defectRate^2 )
+stdevDef
+```
+
+I would expect `r expectedVal` transistors to be produced before the first with a defect. The standard deviation is `r stdevDef`.
+
+#### e) Based on your answers to parts (c) and (d), how does increasing the probability of an event affect the mean and standard deviation of the wait time until success?
+
+Increasing the probability of an event decreases the mean and standard deviation of the wait time until the event.
+
+### 3.38 Male Children  (p166)
+
+### 3.42 Serving in Volleyball (p166)
