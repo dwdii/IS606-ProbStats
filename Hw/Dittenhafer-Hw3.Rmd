@@ -122,10 +122,49 @@ g1 <- ggplot(data=df) +
 g1
 ```
 
+### 3.4 Triathlon times, Part I (p158)
+
+Racer | Group          | Time (sec) |
+------|----------------|------------|
+Leo   | Men, 30 - 34   | 4948       |  
+Mary  | Women, 25 - 29 | 5513       |
+
+Group        | Mean | Stdev |
+-------------|------|-------|
+Men, 30-34   | 4313 | 583   |
+Women, 25-29 | 5261 | 807   |
+
+* Normally distributed finishing times for both groups
+
+#### a) Write down the short-hand for these two normal distributions.
+
+The short-hand for these two normal distributions follows:
+
+Men, 30-34: \(N(\mu = 4313, \sigma = 583)\)
+
+Women, 25-29: \(N(\mu = 5261, \sigma = 807)\)
+
+#### b) What are the Z-scores for Leo's and Mary's finishing times? What do these Z-score tell you?
+
+Using `R`, we define the mean, standard deviation and individual times. Then we compute the Z score using the equation \(Z = \frac{x-\mu}{\sigma}\) for Leo and Mary.
+
+```{r}
+men3034mean <- 4313
+men3034sd <- 583
+leoTime <- 4948
+
+leoZc <- (leoTime - men3034mean) / men3034sd
+leoZc
+
+women3034mean <- 5261
+women3034sd <- 807
+maryTime <- 5513
+
+maryZc <- (maryTime - women3034mean) / women3034sd
+maryZc
+```
 
 
-
-### 3.4  (p?)
 
 ### 3.18  (p?)
 
