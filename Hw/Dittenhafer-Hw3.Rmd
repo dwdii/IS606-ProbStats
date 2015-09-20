@@ -1,0 +1,136 @@
+---
+title: "Homework 3"
+author: "Daniel Dittenhafer"
+date: "September 19, 2015"
+output: pdf_document
+---
+```{r, echo=FALSE} 
+library(ggplot2)
+myTheme <- theme(axis.ticks=element_blank(),  
+                  panel.border = element_rect(color="gray", fill=NA), 
+                  panel.background=element_rect(fill="#FBFBFB"), 
+                  panel.grid.major.y=element_line(color="white", size=0.5), 
+                  panel.grid.major.x=element_line(color="white", size=0.5),
+                  plot.title=element_text(size="10"))
+```
+
+### 3.2 Area under the curve Part II (p158)
+
+***What percent of a standard normal distribution \(N(\mu = 0, \sigma = 1)\) is found in each region? Be sure to draw a graph.***
+
+#### a. Z > -1.13
+
+First, we define in `R` code the Z score and then use the `pnorm` function to determine the percentage on the left tail. Subtract this value from 1 to find the right tail value.
+
+```{r}
+zGt <- -1.13
+pGt <- 1 - pnorm(zGt)
+pGt
+```
+
+The percent of the standard normal distribution found in the region Z > `r zGt` is `r pGt`.
+
+```{r, echo=FALSE}
+x <- seq(-4, 4, length=100)
+hx <- dnorm(x)
+df <- data.frame(x, hx)
+dfRegion <- df[df$x > zGt, ]
+
+g1 <- ggplot(data=df) + 
+  geom_line(aes(x=x, y=hx)) + 
+  geom_ribbon(data=dfRegion, aes(ymin=0, ymax=hx, x=x), fill="lightblue") +
+  labs(title="a) Region Greater Than Z = -1.13", y="", x="") +
+  myTheme
+g1
+```
+
+#### b. Z < 0.18
+
+First, we define in `R` code the Z score and then use the `pnorm` function to determine the percentage on the left tail (less than). 
+
+```{r}
+zLt <- 0.18
+pLt <- pnorm(zLt)
+pLt
+```
+
+The percent of the standard normal distribution found in the region Z < `r zLt` is `r pLt`.
+
+```{r, echo=FALSE}
+x <- seq(-4, 4, length=100)
+hx <- dnorm(x)
+df <- data.frame(x, hx)
+dfRegion <- df[df$x < zLt, ]
+
+g1 <- ggplot(data=df) + 
+  geom_line(aes(x=x, y=hx)) + 
+  geom_ribbon(data=dfRegion, aes(ymin=0, ymax=hx, x=x), fill="lightblue") +
+  labs(title="b) Region Less Than Z = 0.18", y="", x="") +
+  myTheme
+g1
+```
+
+#### c. Z > 8
+
+Again, we define in `R` code the Z score and then use the `pnorm` function to determine the percentage on the right tail (greater than).
+
+```{r}
+zGt <- 8
+pGt <- 1 - pnorm(zGt)
+round(pGt, 4)
+```
+
+The percent of the standard normal distribution found in the region Z > `r zGt` is `r round(pGt, 4)`. This particular scenario is so extreme that it doesn't even show on the visualization.
+
+```{r, echo=FALSE}
+x <- seq(-9, 9, length=100)
+hx <- dnorm(x)
+df <- data.frame(x, hx)
+dfRegion <- df[df$x > zGt, ]
+
+g1 <- ggplot(data=df) + 
+  geom_line(aes(x=x, y=hx)) + 
+  geom_ribbon(data=dfRegion, aes(ymin=0, ymax=hx, x=x), fill="lightblue") +
+  labs(title="c) Region Greater Than Z = 8", y="", x="") +
+  myTheme
+g1
+```
+
+#### d. |Z| < 0.5
+
+Again, we define in `R` code the Z score and then use the `pnorm` function to determine the percentage on the left tail. Due to the absolute value sign on the Z, we are looking for the middle region and subtract the pnorm value from 0.5. Also, this becomes a two tail-like question and we therefore double the value resulting from the `pnorm` subtraction.
+
+```{r}
+zAbs <- 0.5
+pAbs <- 2 * (0.5 - pnorm(-1 * zAbs))
+round(pAbs, 4)
+```
+
+The percent of the standard normal distribution found in the region |Z| < `r zAbs` is `r round(pAbs, 4)`. 
+
+```{r, echo=FALSE}
+x <- seq(-4, 4, length=100)
+hx <- dnorm(x)
+df <- data.frame(x, hx)
+dfRegion <- df[(-1 * zAbs) < df$x & df$x < zAbs, ]
+
+g1 <- ggplot(data=df) + 
+  geom_line(aes(x=x, y=hx)) + 
+  geom_ribbon(data=dfRegion, aes(ymin=0, ymax=hx, x=x), fill="lightblue") +
+  labs(title="d) Region |Z| < 0.5", y="", x="") +
+  myTheme
+g1
+```
+
+
+
+
+### 3.4  (p?)
+
+### 3.18  (p?)
+
+### 3.22  (p?)
+
+### 3.38  (p?)
+
+### 3.42 (p?)
