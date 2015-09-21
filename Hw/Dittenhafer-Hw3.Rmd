@@ -338,4 +338,82 @@ Increasing the probability of an event decreases the mean and standard deviation
 
 ### 3.38 Male Children  (p166)
 
+The actual probability of have a boy is 0.51. Suppose a couple plans to have 3 kids.
+
+#### a) Use the binomial model to calculate the probability that two of them will be boys.
+
+Using the equation on p147 of the text, \(\frac{n!}{k!(n-k)!}p^k(1-p)^{n-k}\):
+
+```{r}
+pBoy <- 0.51
+k <- 2
+n <- 3
+
+facN <- factorial(n)
+facK <- factorial(k)
+facNminusK <- factorial(n-k)
+
+p2boysOf3 <- ( facN / (facK * facNminusK) ) * pBoy^k * (1-pBoy)^(n-k)
+p2boysOf3
+```
+
+The probability that two of the three children will be boys is `r round(p2boysOf3, 4)`.
+
+#### b) Write out all possible orderings of 3 children, 2 of whom are boys. Use these scenarios to calculate the same probability from part (a) by using the addition rule for disjoint outcomes. Confirm that your answers from parts (a) and (b) match.
+
+The following table shows the possible ordering of 3 children with 2 boys:
+
+Child 1 | Child 2 | Child 3 |
+--------|---------|---------|
+Girl    | Boy     | Boy     |
+Boy     | Girl    | Boy     |
+Boy     | Boy     | Girl    |
+
+The following `R` code shows the computation of the probability using the addition rule for disjoint outcomes. As a result of the fact that the probabilities for each of the 3 scenarios above are the same, rather than add them up, we can simply multiply by 3:
+
+```{r}
+p1 <- ((1-pBoy) * pBoy * pBoy) * 3
+p1
+```
+
+As you can see, the result of (a) `r round(p2boysOf3, 4)` equals the result of (b) `r round(p1, 4)`.
+
+
+#### c) If we wanted to calculate the probability that a couple who plans to have 8 kids will have 3 boys, briefly describe why the approach from part (b) would be more tedious than the approach from part (a).
+
+I'm not sure I agree that one approach is more tedious than the other. Mathematically, they appear to be identical, but the use of the factorial seems to simplify the determination of the number of variations that can be created over \(n\) children. Beyond this, the power raised on the boy's probability and the power raised on the girl's probability are simply shorthand for the multiplication that occurs in the addition rule's disjoint compution. In the end, they are simply different ways of writing the same mathematical operations. Certainly the use of the formula can result is a quicker result than computing the result individually for each scenario, but this is true of many mathematical theorems. Once proven to apply in broad practice, the formula can be used without having to re-prove it.
+
 ### 3.42 Serving in Volleyball (p166)
+
+A volleyball player has a 15% chance of making the serve. Suppose that her serves are independent of each other.
+
+#### a) What is the probability that on the 10th try she will make her 3rd successful serve?
+
+Using the negative binomial distribution:
+
+```{r}
+pServe <- 0.15
+n <- 10
+k <- 3
+
+negBinomialDist <- function(p, n, k)
+{
+  pRes <- (factorial(n - 1) / 
+             (factorial(k-1) * (factorial((n - 1) - (k - 1)))
+              )
+           ) * 
+    p^k * 
+    (1-p)^(n-k)
+}
+
+p3of10 <- negBinomialDist(pServe, n, k)
+p3of10
+```
+
+#### b) Suppose she has made two successful serves in nine attempts. What is the probability that her 10th serve will be successful?
+
+As a result of all trials being independent, the probability the next serve will be successful is still 15%, regardless of the prior history.
+
+#### c) Even though parts (a) and (b) discuss the same scenario, the probabilities you calculated should be different. Can you explain the reason for the discrepancy?
+
+There isn't a discrepancy in my mind. The first scenario is talking about a series of future serves, where the second scenario is talking about a single future serve. A single future serve is known to have a 15% probability of success, given the assumption that her serves are independent. The "2 of 9" prior information isn't a factor in the determination of the next serve.
