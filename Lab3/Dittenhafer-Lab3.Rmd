@@ -56,7 +56,7 @@ fdims <- subset(bdims, sex == 0)
 1.  Make a histogram of men's heights and a histogram of women's heights.  How 
     would you compare the various aspects of the two distributions?
     
-    **The histogram for men's and women's heighs are shown below. The distributions are similar is several
+    **The histogram for men's and women's heights are shown below. The distributions are similar is several
     ways such as they both are multi-model and mostly balanced with no significant skew. There is a bell shape, 
     though it isn't clear this data is normally distributed. It is interesting to see the peaks around the even   numbers for women between between 160 - 170cm .**
     
@@ -216,14 +216,14 @@ qqnormsim(fdims$hgt)
     female heights are nearly normal?
     
     **The normal probability plot does look similar to the simulated data plots. 
-    They both have "errant" points on the tails, through the similulated data
+    They both have "errant" points on the tails, though the simulated data
     follows the line much more closely.**
 
 5.  Using the same technique, determine whether or not female weights appear to 
     come from a normal distribution.
     
-    **Using the same technique, the weights are decently normal in the middle area, 
-    near the tails, particularlly the upper tail, some significant deviations.**
+    **Using the same technique, the weights are decently normal in the middle area. 
+    Near the tails, particularlly the upper tail, some significant deviations exist.**
     
     ```{r qqnormsimWgt, eval=TRUE}
     qqnormsim(fdims$wgt)
