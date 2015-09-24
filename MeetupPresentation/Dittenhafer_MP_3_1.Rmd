@@ -28,6 +28,11 @@ b. Z >  1.48
 c. -0.4 < Z < 1.5
 d. |Z| > 2
 
+<br /><br /><br /><br />
+<div style="font-size:8px">
+* This question is taken from p158 of the OpenIntro Statistics (3rd Edition) book available at OpenIntro.org. 
+</div>
+
 ## (a) Z < -1.35
 
 First, we define in `R` code the Z score and then use the `pnorm` function to determine the percentage on the left tail. 
