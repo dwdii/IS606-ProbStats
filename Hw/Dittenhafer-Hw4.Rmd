@@ -14,7 +14,19 @@ myTheme <- theme(axis.ticks=element_blank(),
                   plot.title=element_text(size="10"))
 ```
 
-### 4.4  (p)
+### 4.4  Heights of adults (p204)
+
+*Researchers studyiing anthropometry collected body girth measurements and skeletal diameter measurements, as well as age, weight, height an gender, for 507 physically active individuals.*
+
+#### a) What is the point estimate for the average height of active individuals? What about the median?
+
+The mean would be the point estimate for the average height, which is 171.1. The median is 170.3.
+
+#### b) What is the point estimate for the standard deviation of the heights of active individuals? What about the IQR?
+
+Given the distribution is mostly normal, we can use the sample standard deviation as the point estimate for the population standard deviation (p173), SD=9.4. 
+
+The IQR would be derived from the sample IQR of Q3 - Q1 = 177.8 - 163.8 = `r 177.8 - 163.8`.
 
 
 ### 4.14  (p)
