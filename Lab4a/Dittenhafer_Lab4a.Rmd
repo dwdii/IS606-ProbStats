@@ -128,7 +128,7 @@ can build up the sampling distribution for the sample mean by repeating the
 above steps many times. Here we will generate 5000 samples and compute the 
 sample mean of each.
 
-```{r loop, eval=FALSE}
+```{r loop, eval=TRUE}
 sample_means50 <- rep(NA, 5000)
 
 for(i in 1:5000){
@@ -142,8 +142,11 @@ hist(sample_means50)
 If you would like to adjust the bin width of your histogram to show a little 
 more detail, you can do so by changing the `breaks` argument.
 
-```{r hist-breaks, eval=FALSE}
+```{r hist-breaks, eval=TRUE}
 hist(sample_means50, breaks = 25)
+
+qqnorm(sample_means50)
+qqline(sample_means50)
 ```
 
 Here we use R to take 5000 samples of size 50 from the population, calculate 
@@ -154,6 +157,8 @@ the mean of each sample, and store each result in a vector called
     distribution, and be sure to specifically note its center.  Would you 
     expect the distribution to change if we instead collected 50,000 sample 
     means?
+    
+    **`sample_means50` contains 5000 elements. The sampling distribution is very much in a normal shape, unimodal with a center just shy of 1500. As shown in the QQ plot, the sampling distribution is very close to the normal line. If we collected 50,000 sample means, by the Central Limit Theorem, the distribution would even more closely match the normal distribution and center around the population mean.**
 
 ## Interlude: The `for` loop
 
@@ -230,6 +235,18 @@ initialized at the outset.
     `sample_means_small` into the console and press enter).  How many elements 
     are there in this object called `sample_means_small`? What does each 
     element represent?
+    
+    ```{r}
+    sample_means_small <- rep(NA, 100)
+    for(i in 1:100)
+    {
+      s <- sample(area, 50)
+      sample_means_small[i] <- mean(s)
+    }
+    summary(sample_means_small)
+    ```
+    
+    **There are 100 elements in the `sample_means_small` object and each element represents the mean of a sample from the area population.**
 
 ## Sample size and the sampling distribution
 
@@ -250,7 +267,7 @@ To get a sense of the effect that sample size has on our distribution, let's
 build up two more sampling distributions: one based on a sample size of 10 and 
 another based on a sample size of 100.
 
-```{r samp-10-100, eval=FALSE}
+```{r samp-10-100, eval=TRUE}
 sample_means10 <- rep(NA, 5000)
 sample_means100 <- rep(NA, 5000)
 
@@ -274,7 +291,7 @@ get replaced with the new one.
 To see the effect that different sample sizes have on the sampling 
 distribution, plot the three distributions on top of one another.
 
-```{r plot-samps, eval=FALSE, tidy = FALSE}
+```{r plot-samps, eval=TRUE, tidy = FALSE}
 par(mfrow = c(3, 1))
 
 xlimits <- range(sample_means10)
@@ -294,6 +311,8 @@ plotted with the same limits on the x-axis.
 
 6.  When the sample size is larger, what happens to the center?  What about the spread?
 
+**When the sample size is larger, the center become more prominent and the spread narrows. **
+
 * * *
 ## On your own
 
@@ -302,6 +321,12 @@ Ames.  Now you'll try to estimate the mean home price.
 
 -   Take a random sample of size 50 from `price`. Using this sample, what is 
     your best point estimate of the population mean?
+    
+    ```{r}
+    sPrice50 <- sample(price, 50)
+    mPrice50 <- mean(sPrice50)
+    mPrice50
+    ```
 
 -   Since you have access to the population, simulate the sampling 
     distribution for $\bar{x}_{price}$ by taking 5000 samples from the 
@@ -310,6 +335,27 @@ Ames.  Now you'll try to estimate the mean home price.
     shape of this sampling distribution. Based on this sampling distribution, 
     what would you guess the mean home price of the population to be? Finally, 
     calculate and report the population mean.
+    
+    ```{r}
+    sample_means50 <- rep(NA, 5000)
+    for(i in 1:5000)
+    {
+      s <- sample(price, 50)
+      sample_means50[i] <- mean(s)
+    }
+    
+    hist(sample_means50, 32)
+    ```
+    
+    
+    **The sampling distribution has a bell shape and looks fairlly normal. It is unimodal with only a slight right skew.**
+    
+    **I would estimate the mean home price of the population to be 176000-178000.**
+    
+    ```{r}
+    popMeanPrice <- mean(price)
+    popMeanPrice
+    ```
 
 -   Change your sample size from 50 to 150, then compute the sampling 
     distribution using the same method as above, and store these means in a 
