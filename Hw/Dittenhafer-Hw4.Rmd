@@ -28,8 +28,51 @@ Given the distribution is mostly normal, we can use the sample standard deviatio
 
 The IQR would be derived from the sample IQR of Q3 - Q1 = 177.8 - 163.8 = `r 177.8 - 163.8`.
 
+#### c) Is a person who is 1m 80cm (180cm) tall considered unusually tall? And is a person who is 1m 55cm (155cm) considered unusually short? Explain your reasoning.
 
-### 4.14  (p)
+After codifying the sample mean and standard deviation, we compute the Z score for the 180cm tall scenario.
+
+```{r}
+meanHeight <- 171.1
+sdHeight <- 9.4
+
+x <- 180
+zTall <- (x - meanHeight) / sdHeight
+
+pTall <- pnorm(zTall)
+pTall
+```
+
+Being 180cm tall puts one at `r zTall` standard deviations above the mean with `r round(1 - pTall, 4) * 100` % of people taller. As such, I would *not* consider being 180cm tall particularly unusual, though it is taller than `r round(pTall, 4) * 100` % of the sample.
+
+```{r}
+x <- 155
+zShort <- (x - meanHeight) / sdHeight
+pShort <- pnorm(zShort)
+pShort
+```
+
+Being 155cm tall puts one at `r zShort` standard deviations below the mean with `r round(1 - pShort, 4) * 100` % of people taller. As such, I would consider being 155cm tall unusual, with just `r round(pShort, 4) * 100` % of the sample being shorter
+
+#### d) The researchers take another random sample of physically active individuals. Would you expect the mean and the standard deviation of this new sample to be the ones given above? Explain your reasoning.
+
+I would not expect identical mean and standard deviation in the new sample unless by some coincidence the second sample cases where identical to the first. With that said, any new sample mean and standard deviation would be normally distributed around the population mean and standard deviation.
+
+#### e) 
+
+We quantify the variability of the point estimates through the Standard Error (SE) which is the standard deviation of the sampling distribution. Using `R` we compute the SE for the sample below:
+
+```{r}
+n <- 507
+seHeight <- sdHeight / sqrt(n)
+seHeight
+```
+
+### 4.14 Thanksgiving spending, Part I (p208)
+
+#### a) We are 95% confident that the average spending of these 436 American adults is between $80.31 and $89.11.
+
+More accurately, I would say we are 95% confident that the average spending of the population is between $80.31 and $89.11. It seems we could be 100% confident the average spending of the specific individuals in the survey is between the upper and lower bound. The confidennce internal is meant to measure the likelyhood of the population parameter falls within the range.
 
 ### 4.24  (p)
 
