@@ -20,6 +20,11 @@ if (before && options$fig.show!='none') par(mar=c(4,4,.2,.1),cex.lab=.95,cex.axi
 
 ```{r}
 # load data
+#dataFile <- "C:/Users/Dan/Downloads/WorldValuesSurvey/WVS_Longitudinal_1981-2014_rdata_v_2015_04_18/WVS_Longitudinal_1981_2014_R_v2015_04_18.rdata"
+dataFile <- "C:/Code/R/IS606-ProbStats/FinalProject/data/WVS_subData.RData"
+load(dataFile)
+
+summary(WVS_Subset)
 
 ```
 
@@ -28,6 +33,16 @@ if (before && options$fig.show!='none') par(mar=c(4,4,.2,.1),cex.lab=.95,cex.axi
 
 **You should phrase your research question in a way that matches up with the scope of inference your dataset allows for.**
 
+How have the values of people from the United States changed over time with regard to science and technology and its positive/negative impact on the world.
+
+  | Variables | Description
+--|-----------|------------
+005_203| E234 | The world is better off, or worse off, because of science and technology
+010_023| S020 | Year survey
+010_028| S024 | Country wave
+010_004| S003 | Country/region
+014_003| X003 | Age
+014_030| X025 |	Highest educational level attained
 
 
 ### Cases 
