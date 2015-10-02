@@ -18,14 +18,40 @@ if (before && options$fig.show!='none') par(mar=c(4,4,.2,.1),cex.lab=.95,cex.axi
 })
 ```
 
+```{r,, echo=FALSE}
+library(plyr)
+library(knitcitations)
+library(RefManageR)
+cleanbib()
+cite_options(style="markdown")
+
+bibWorldValSurvey <- bibentry(bibtype="Misc", 
+                              author=person(family="World Values Survey Association"),
+                              title="WORLD VALUES SURVEY 1981-2014 LONGITUDINAL AGGREGATE v.20150418",
+                              year=2014,
+                              url="http://www.worldvaluessurvey.org/WVSDocumentationWVL.jsp",
+                              note="Aggregate File Producer: JDSystems",
+                              address="Madrid SPAIN"
+                              )
+
+bibWvsFieldworkSampling <- bibentry(bibtype="Misc", 
+                              author=person(family="World Values Survey Association"),
+                              title="Fieldwork and Sampling",
+                              year=2015,
+                              url="http://www.worldvaluessurvey.org/WVSContents.jsp")
+
+# Original WVS Data File, Size 1.4GB
+#dataFile <- "C:/Users/Dan/Downloads/WorldValuesSurvey/WVS_Longitudinal_1981-2014_rdata_v_2015_04_18/WVS_Longitudinal_1981_2014_R_v2015_04_18.rdata"
+```
+
 ```{r}
 # load data
-#dataFile <- "C:/Users/Dan/Downloads/WorldValuesSurvey/WVS_Longitudinal_1981-2014_rdata_v_2015_04_18/WVS_Longitudinal_1981_2014_R_v2015_04_18.rdata"
 dataFile <- "C:/Code/R/IS606-ProbStats/FinalProject/data/WVS_subData.RData"
 load(dataFile)
-
-summary(WVS_Subset)
-
+colnames(WVS_Subset) <- c("KeyQuestion", "Year", "CountryWave", "Country", "Age", "HighestEducation")
+# Subset to just United States
+WVS_US <- WVS_Subset[WVS_Subset$Country == 840, ]
+WVS_US$CountryName <- "United States"
 ```
 
 
@@ -49,25 +75,33 @@ How have the values of people from the United States changed over time with rega
 
 **What are the cases, and how many are there?**
 
+Each row in the data set is a case and represents the results of an interview conducted by the World Values Survey with an individual age 18 or above. `r citep(bibWvsFieldworkSampling)`
 
+There are `r nrow(WVS_US)` cases in the subset of data to be used in the project.
+```{r}
+nrow(WVS_US)
+```
 
 ### Data collection 
 
 **Describe the method of data collection.**
 
-
+According to the World Values Survey website, the data is collected either through "face-to-face interviews or phone interviews for remote areas." `r citep(bibWvsFieldworkSampling)`
 
 ### Type of study 
 
 **What type of study is this (observational/experiment)?**
 
+The World Values Survey is an observational study, and this data project will be analyzing a subset of the observational study conducted by the World Values Survey Association.
 
 
 ### Data Source 
 
 **If you collected the data, state self-collected. If not, provide a citation/link.**
 
+The data was collected and made available by the World Values Survey Association. `r  citep(bibWorldValSurvey)`.
 
+The link to the data page is: http://www.worldvaluessurvey.org/WVSDocumentationWVL.jsp
 
 
 ### Response 
@@ -84,10 +118,15 @@ How have the values of people from the United States changed over time with rega
 
 ### Relevant summary statistics 
 
-**Provide summary statistics relevant to your research question. For example, if you’re comparing means across groups provide means, SDs, sample sizes of each group. This step requires the use of R, hence a code chunk is provided below. Insert more code chunks as needed.**
+**Provide summary statistics relevant to your research question. For example, if you're comparing means across groups provide means, SDs, sample sizes of each group. This step requires the use of R, hence a code chunk is provided below. Insert more code chunks as needed.**
 
 ```{r}
-
+summary(WVS_US)
 ```
 
+### References
 
+```{r, results='asis', echo=FALSE}
+BibOptions(style="html", bib.style="authortitle")
+bibliography()
+```
