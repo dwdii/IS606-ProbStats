@@ -152,7 +152,47 @@ Sample size is small, at 36, but above the minimum of 30. The distribution is a 
 
 #### b) Suppose you read online that children first count to 10 successfully when they are 32 months old, on average. Perform a hypothesis test to evaluate if these data provide convincing evidence that the average age at which gifted children first count to 10 successfully is less than the general average of 32 months. Use a significance level of 0.10.
 
+Setting up the hypothesis as follows:
 
+\(H_0: m_g = 32\) (The gifted children's average months is equal to 32 (the average for children in general).)
+
+\(H_A: m_g < 32\) (The gifted children's average months is less than 32.)
+
+\(\alpha = 0.10\)
+
+```{r}
+a <- 0.10
+xbar <- 30.69
+SEz <- 4.31 / sqrt(36)
+theZ <- qnorm(1 - a) # ~1.285
+theZ
+
+lower <- xbar - (theZ * SEz)
+upper <- xbar + (theZ * SEz)
+ci <- c(lower, upper)
+ci
+
+
+```
+
+Due to the resulting 90% confidence interval of `r lower` - `r upper` being less than the 32 month value, I conclude to reject the null hypothesis in favor of the alternative.
+
+#### c)  Interpret the p-value in context of the hypothesis test and the data.
+
+We compute the Z score of the gifted months relative to the \(H_0\) value of 32, then lookup the p-value using the `pnorm` function. This is a left-tailed test, therefore we don't subtract from 1, and instead keep the pval as is.
+
+```{r}
+MgZ <- xbar - 32 / SEz
+MgZ
+pval <- pnorm(MgZ)
+pval
+```
+
+The pval of `r round(pval, 5)` is much lower than the significance level \(\alpha=`r a`\). This suggests the gifted months mean of `r xbar` is not even close to the 32 month average.
+
+#### d) Calculate the 90% confidence interval for the average age at which gifted children first count to 10 successfully.
+
+#### e) Do your results from the hyposthesis test and the confidence interval agree? Explain.
 
 ### 4.26  (p)
 
