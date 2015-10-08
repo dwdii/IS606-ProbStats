@@ -152,52 +152,173 @@ Sample size is small, at 36, but above the minimum of 30. The distribution is a 
 
 #### b) Suppose you read online that children first count to 10 successfully when they are 32 months old, on average. Perform a hypothesis test to evaluate if these data provide convincing evidence that the average age at which gifted children first count to 10 successfully is less than the general average of 32 months. Use a significance level of 0.10.
 
-Setting up the hypothesis as follows:
+Setting up the hypothesis test as follows:
 
-\(H_0: m_g = 32\) (The gifted children's average months is equal to 32 (the average for children in general).)
+\(H_0: \mu_g = 32\) (The gifted children's average months is equal to 32 (the average for children in general).)
 
-\(H_A: m_g < 32\) (The gifted children's average months is less than 32.)
+\(H_A: \mu_g < 32\) (The gifted children's average months is less than 32.)
 
 \(\alpha = 0.10\)
 
 ```{r}
 a <- 0.10
 xbar <- 30.69
-SEz <- 4.31 / sqrt(36)
-theZ <- qnorm(1 - a) # ~1.285
-theZ
-
-lower <- xbar - (theZ * SEz)
-upper <- xbar + (theZ * SEz)
-ci <- c(lower, upper)
-ci
-
-
+sdX <- 4.31
+n <- 36
+SEx <- sdX / sqrt(n)
+zXbar <- (xbar - 32) / SEx
+zXbar
 ```
 
-Due to the resulting 90% confidence interval of `r lower` - `r upper` being less than the 32 month value, I conclude to reject the null hypothesis in favor of the alternative.
+This is a one-sided hypothesis test as shown below:
 
-#### c)  Interpret the p-value in context of the hypothesis test and the data.
+```{r, echo=FALSE}
+x <- seq(-4, 4, length=100)
+hx <- dnorm(x)
+df <- data.frame(x, hx)
+dfRegion <- df[df$x < zXbar, ]
 
-We compute the Z score of the gifted months relative to the \(H_0\) value of 32, then lookup the p-value using the `pnorm` function. This is a left-tailed test, therefore we don't subtract from 1, and instead keep the pval as is.
+g1 <- ggplot() + 
+  geom_line(aes(x=x, y=hx)) + 
+  geom_ribbon(data=dfRegion, aes(ymin=0, ymax=hx, x=x), fill="lightblue") +
+  labs(title="4.24 Rejection Region (blue)", y="", x="") +
+  myTheme
+g1
+```
 
 ```{r}
-MgZ <- xbar - 32 / SEz
-MgZ
-pval <- pnorm(MgZ)
+pval <- pnorm(zXbar)
 pval
 ```
 
-The pval of `r round(pval, 5)` is much lower than the significance level \(\alpha=`r a`\). This suggests the gifted months mean of `r xbar` is not even close to the 32 month average.
+#### c)  Interpret the p-value in context of the hypothesis test and the data.
+
+The p-value of `r round(pval, 5)` is much lower than the significance level \(\alpha=`r a`\). This suggests the gifted months mean of `r xbar` is not even close to the 32 month average. Therefore, I conclude to reject the null hypothesis in favor of the alternative. In other words, it is implausible that we would see a mean from our sample as low as we did if there wasn't a significant different between gifted and non-gifted children.
+
 
 #### d) Calculate the 90% confidence interval for the average age at which gifted children first count to 10 successfully.
 
+The following R code computes the 90% confidence interval.
+
+```{r}
+# Determine z score of 0.10
+theZ <- abs(qnorm(a))
+theZ
+# Compute the confidence interval
+lower <- xbar - (theZ * SEx)
+upper <- xbar + (theZ * SEx)
+ci <- c(lower, upper)
+ci
+```
+
+The 90% confidence interval of the gifted children is `r lower` - `r upper`.
+
+
 #### e) Do your results from the hyposthesis test and the confidence interval agree? Explain.
 
-### 4.26  (p)
+The results agree because the range of the confidence interval does not overlap the average of 32 for non-gifted children. If the CI range had overlapped, this would indicate that 32 might be the population mean for the gifted children and would have caused us to fail to reject the null hypothesis. 
 
-### 4.34  (p)
+### 4.26 Gifted Children, Part II  (p212)
 
-### 4.40  (p)
+#### a) Perform a hypothesis test to evaluate if these data provide a convincing evidence that the average IQ of mothers of gifted children is different that the average IQ for the population at large, which is 100. Use a significance level of 0.10.
+
+Setting up the hypothesis test as follows:
+
+\(H_0: \mu_g = 100\) (The gifted children's mother's IQ is equal to the average IQ.)
+
+\(H_A: \mu_g > 100\) (The gifted children's  mother's IQ is greater than the average IQ)
+
+\(\alpha = 0.10\)
+
+```{r}
+n <- 36
+xbar <- 118.2
+sdX <- 6.5
+SEx <- sdX / sqrt(n)
+zXbar <- (xbar - 100) / SEx
+zXbar
+```
+
+This is a one-sided, upper tail hypothesis, though the rejection region is so small that it is not visible in the visualization.
+
+```{r, echo=FALSE}
+x <- seq(-17, 17, length=100)
+hx <- dnorm(x)
+df <- data.frame(x, hx)
+dfRegion <- df[df$x > zXbar, ]
+
+g1 <- ggplot() + 
+  geom_line(aes(x=x, y=hx)) + 
+  geom_ribbon(data=dfRegion, aes(ymin=0, ymax=hx, x=x), fill="lightblue") +
+  labs(title="4.26 Rejection Region (blue)", y="", x="") +
+  myTheme
+g1
+```
+
+Computing the p-value. Since this is an upper tail test, we subtract from 1.
+```{r}
+pval <- 1 - pnorm(zXbar)
+pval
+```
+
+The p-value of `r round(pval, 5)` is much lower than the significance level \(\alpha=`r a`\). This suggests the IQs of mothers of gifted children mean of `r xbar` is not even close to the 32 month average. Therefore, I conclude to reject the null hypothesis in favor of the alternative. In other words, it is implausible that we would see a mean from our sample as high as we did if there wasn't a significant different between gifted and non-gifted mother's IQ.
+
+#### b) Calculate the 90% confidence interval for the average IQ of mothers of gifted children.
+
+The following R code computes the 90% confidence interval.
+
+```{r}
+# Determine z score of 0.10
+theZ <- abs(qnorm(a))
+theZ
+# Compute the confidence interval
+lower <- xbar - (theZ * SEx)
+upper <- xbar + (theZ * SEx)
+ci <- c(lower, upper)
+ci
+```
+
+The 90% confidence interval of the IQ of mother's of gifted children is `r lower` - `r upper`.
+
+#### c) Do your results from the hypothesis test and the confidence interval agree? Explain.
+
+Yes, the results agree. The confidence interval for Mother's IQ for gifted children is well above the 100 average for mother's of non-gifted children.
+
+
+### 4.34 CLT (p214)
+
+#### Define the term "sampling distribution" of the mean, and describe how the shape, center and spread of the sampling distribution of the mean change as sample size increases.
+
+The *sampling distribution* of the mean is the distribution of mean values from repeated samples from a population. The shape is approximately normal, with a center at the population mean. The shape more closely approximates the normal distribution as more samples are taken and included. This also will move the center closer to the population mean. Likewise, the spread of the sampling distribution will narrow around the population mean as more samples are included.
+
+
+### 4.40 CFLBs (p216)
+
+*A manufacturer of compact fourescent light bulbs advertises that the distribution of the lifespans of these light bulbs is nearly normal with a mean of 9,000 hours and a standard deviation of 1,000 hours.*
+
+#### a) What is the probability that a randomly chosen light bulb lasts more than 10,500 hours?
+
+Basically we want to find the p-value of 10,500 hours.
+
+```{r}
+# First compute the z-score for 10,500 hours
+z <- (10500 - 9000) / 1000
+z
+# Then determine the area under the normal curve at said z score. 
+# Since we want the area of the upper tail, we'll substract from 1.
+p <- 1 - pnorm(z)
+p
+```
+
+The probability that a randomly chosen light bulb last more than 10,500 hours is `r round(p, 4)`.
+
+#### b) Describe the distribution of the mean lifespan of 15 light bulbs.
+
+#### c) What is the probability that the mean lifespan of 15 randomly chosen light bulbs is more than 10,500 hours?
+
+#### d) Sketch the two distributions (population and sampling) on the same scale.
+
+#### e) Could you estimate the probabilities from parts (a) and (c) if the lifespans of light bulbs had a skewed distribution?
+
 
 ### 4.48  (p)
