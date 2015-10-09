@@ -1,7 +1,7 @@
 ---
 title: "IS606 - Homework 4"
 author: "Daniel Dittenhafer"
-date: "September 24, 2015"
+date: "October 11, 2015"
 output: pdf_document
 ---
 ```{r, echo=FALSE} 
@@ -314,11 +314,91 @@ The probability that a randomly chosen light bulb last more than 10,500 hours is
 
 #### b) Describe the distribution of the mean lifespan of 15 light bulbs.
 
+Assuming random sampling of 15 independent light bulbs, the distribution of the mean lifespan would be centered near population mean (claimed to be 9000 hours) and having a nearly normal shape.
+
 #### c) What is the probability that the mean lifespan of 15 randomly chosen light bulbs is more than 10,500 hours?
+
+Assuming the question is driving at the probability that all of some 15 randomly selected lights each have a lifespan of more than 10,500 hours, since we know the probability of one randomly chosen light bulb having a lifespan of 10,500 hours is `r round(p, 4)`, the probability for 15 independent lights bulbs would be \(P(15 \text{ bulbs with lifespan }=10,500)=`r round(p, 4)`^{15}=`r p^15`\approx`r round(p^15, 6)`\)
+
+Another way to look at this is how likely would a given sample of 15 light bulbs have a mean lifespan of 10,500 hours?
+
+\(H_0: \bar{x}=10,500\)
+
+\(H_A: \bar{x}\neq10,500\)
+
+```{r}
+mu <- 9000
+s <- 1000
+# Compute standard error of the mean
+se <- s / sqrt(15)
+se
+# What is the z-score within the sampling distribution of a mean of 10,500 
+z10k5 <- (10500 - 9000) / se
+z10k5
+# Lookup the p value for this Z score.
+pv <- pnorm(z10k5, mean=mu, sd=s)
+pv
+```
+
+The area under normal curve for a Z score of `r z10k5` is so small it is effectively zero.
 
 #### d) Sketch the two distributions (population and sampling) on the same scale.
 
+Visualization is shown below the code segment that produces it: 
+
+```{r}
+x <- seq(mu - (4 * s), mu + (4 * s), length=100)
+hx <- dnorm(x, mean=mu, sd=s)
+df <- data.frame(name="Population", x, hx)
+
+smpl <- seq(mu - (4 * se), mu + (4 * se), length=100)
+hxSmpl <- dnorm(smpl, mean=mu, sd=se)
+df <- rbind(df, data.frame(name="Sampling", x=smpl, hx=hxSmpl))
+
+g1 <- ggplot() +
+    geom_line(data=df, aes(x=x, y=hx, color=name)) +
+    myTheme +
+    labs(title="Distribution of CFLBs")
+g1
+```
+
+
 #### e) Could you estimate the probabilities from parts (a) and (c) if the lifespans of light bulbs had a skewed distribution?
 
+I don't think my estimate for (a) would be very useful. Based on information from the OpenIntro text, I understand that there are techniques to deal with skewed distributions. Either way, the sampling distribution would still tend toward a normal shape and our existing tools could be used to estimate (c).
 
-### 4.48  (p)
+
+### 4.48 Same observation, different sample size  (p218)
+
+*Suppose you conduct a hypothesis test based on a sample where the sample size is \(n=50\), and arrive at a p-value of 0.08. You then refer back to your notes and discover that you made a careless mistake, the sample size should have been \(n=500\). Will your p-value increase, decrease, or stay the same? Explain.*
+
+First let's examine what happens to the standard error value:
+
+```{r}
+s <- 1
+se1 <- s / sqrt(50)
+se2 <- s / sqrt(500)
+c(se1, se2)
+```
+
+Standard error gets smaller as sample size increases, in our example from `r se1` to `r se2`. What happens next? The standard error would likely be used in the hypothesis test to determine the z score of the alternate hypothesis.
+
+```{r}
+xbar <- 100.3
+zXbar1 <- (xbar - 100) / se1
+zXbar2 <- (xbar - 100) / se2
+c(zXbar1, zXbar2)
+```
+
+Z score gets more extreme as sample size increases... Ok, so what does this do to the p-value?
+
+```{r}
+pval1 <- 1 - pnorm(zXbar1)
+pval2 <- 1 - pnorm(zXbar2)
+c(pval1, pval2)
+```
+
+p-value gets smaller as sample size increases, which would give stronger evidence of a difference if any.
+
+Conclusion: p-value of 0.08 would decrease to something signficantly smaller as shown through the example.
+
