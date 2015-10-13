@@ -1,7 +1,7 @@
 ---
 title: "IS606 Data Project"
 author: "Daniel Dittenhafer"
-date: "September 28, 2015"
+date: "October 19, 2015"
 output: pdf_document
 ---
 ```{r include=FALSE, cache=FALSE}
@@ -40,18 +40,32 @@ bibWvsFieldworkSampling <- bibentry(bibtype="Misc",
                               year=2015,
                               url="http://www.worldvaluessurvey.org/WVSContents.jsp")
 
+# 
 # Original WVS Data File, Size 1.4GB
+#
 #dataFile <- "C:/Users/Dan/Downloads/WorldValuesSurvey/WVS_Longitudinal_1981-2014_rdata_v_2015_04_18/WVS_Longitudinal_1981_2014_R_v2015_04_18.rdata"
+#load(dataFile)
+#colsToKeep <- c("E234", "S020",  "S024", "S003", "X003", "X025", "A006")
+#WVS_Subset <- WVS_Longitudinal_1981_2014_R_v2015_04_18[,colsToKeep]
+#save(WVS_Subset, file="C:/Code/R/IS606-ProbStats/FinalProject/data/WVS_subData.RData")
 ```
 
 ```{r}
 # load data
 dataFile <- "C:/Code/R/IS606-ProbStats/FinalProject/data/WVS_subData.RData"
 load(dataFile)
-colnames(WVS_Subset) <- c("KeyQuestion", "Year", "CountryWave", "Country", "Age", "HighestEducation")
+colnames(WVS_Subset) <- c("KeyQuestion",
+                          "Year", 
+                          "CountryWave", 
+                          "Country", 
+                          "Age", 
+                          "HighestEducation",
+                          "ReligionImportant")
 # Subset to just United States
 WVS_US <- WVS_Subset[WVS_Subset$Country == 840, ]
 WVS_US$CountryName <- "United States"
+
+summary(WVS_US)
 ```
 
 
@@ -59,7 +73,7 @@ WVS_US$CountryName <- "United States"
 
 **You should phrase your research question in a way that matches up with the scope of inference your dataset allows for.**
 
-How have the values of people from the United States changed over time with regard to science and technology and its positive/negative impact on the world.
+How have the values of people from the United States changed over time with regard to science and technology and its positive/negative impact on the world? Is there a significant difference in views at different educational levels? 
 
   | Variables | Description
 --|-----------|------------
@@ -69,6 +83,8 @@ How have the values of people from the United States changed over time with rega
 010_004| S003 | Country/region
 014_003| X003 | Age
 014_030| X025 |	Highest educational level attained
+001_006| A006	| Important in life: Religion
+
 
 
 ### Cases 
@@ -108,12 +124,65 @@ The link to the data page is: http://www.worldvaluessurvey.org/WVSDocumentationW
 
 **What is the response variable, and what type is it (numerical/categorical)?**
 
+The response variable is the answer provided to the key question, "Is the world is better off, or worse off, because of science and technology?"
 
+The answers are categorical in nature, but ordinal in their degree of support for the better/worse outcome. The distinct answer values and the description of each value are shown in the table below.
+
+Value | Description
+------|------------
+1|A lot worse off
+2|2
+3|3
+4|4
+5|5
+6|6
+7|7
+8|8
+9|9
+10|A lot better off
+-5|Missing; Unknown
+-4|Not asked in survey
+-3|Not applicable
+-2|No answer
+-1|Don´t know
 
 ### Explanatory 
 
-**What is the explanatory variable, and what type is it (numerical/categorival)?**
+**What is the explanatory variable, and what type is it (numerical/categorical)?**
 
+The explanatory variables I've choosen to analyze are the "Highest educational level attained" value and the "Important in life: Religion" variable. Again, these are categorical variables, but ordinal in terms of level of education and degree of importance of religion. The values and descriptions for each variable follow:
+
+**Highest educational level attained**
+
+Value | Description
+------|------------
+1|Inadequately completed elementary education
+2|Completed (compulsory) elementary education
+3|Incomplete secondary school: technical/vocational type/elementary education, basic vocational qual.
+4|Complete secondary school: technical/vocational type/Secondary, intermediate vocational qualification
+5|Incomplete secondary: university-preparatory type/Secondary, intermediate general qualification
+6|Complete secondary: university-preparatory type/Full secondary, maturity level certificate
+7|Some university without degree/Higher education - lower-level tertiary certificate
+8|University with degree/Higher education - upper-level tertiary certificate
+-5|Missing; Unknown
+-4|Not asked in survey
+-3|Not applicable; No formal education
+-2|No answer
+-1|Don´t know
+
+**Important in life: Religion**
+
+Value | Description
+------|------------
+-5|Missing; Unknown
+-4|Not asked in survey
+-3|Not applicable
+-2|No answer
+-1|Don´t know
+1|Very important
+2|Rather important
+3|Not very important
+4|Not at all important
 
 
 ### Relevant summary statistics 
