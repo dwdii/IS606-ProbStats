@@ -1,0 +1,97 @@
+---
+title: "IS606 Final Project"
+author: "Daniel Dittenhafer"
+date: "October 12, 2015"
+output: pdf_document
+---
+```{r include=FALSE, cache=FALSE}
+# DO NOT REMOVE
+# THIS IS FOR SETTING SOME PLOTTING PARAMETERS SO THAT YOUR PLOTS DON'T TAKE UP TOO MUCH SPACE
+# IF YOU WOULD LIKE TO CHANGE THESE, SEE HELP FILES ON THE par() FUNCTION
+# OR ASK FOR HELP
+library(knitr)
+## set global chunk options
+opts_chunk$set(fig.path='figure/manual-', cache.path='cache/manual-', fig.align='center', fig.show='hold', par=TRUE)
+## tune details of base graphics (http://yihui.name/knitr/hooks)
+knit_hooks$set(par=function(before, options, envir){
+if (before && options$fig.show!='none') par(mar=c(4,4,.2,.1),cex.lab=.95,cex.axis=.9,mgp=c(2,.7,0),tcl=-.3)
+})
+```
+
+```{r, echo=FALSE}
+library(plyr)
+library(knitcitations)
+library(RefManageR)
+cleanbib()
+cite_options(style="markdown")
+
+bibWorldValSurvey <- bibentry(bibtype="Misc", 
+                              author=person(family="World Values Survey Association"),
+                              title="WORLD VALUES SURVEY 1981-2014 LONGITUDINAL AGGREGATE v.20150418",
+                              year=2014,
+                              url="http://www.worldvaluessurvey.org/WVSDocumentationWVL.jsp",
+                              note="Aggregate File Producer: JDSystems",
+                              address="Madrid SPAIN"
+                              )
+
+bibWvsFieldworkSampling <- bibentry(bibtype="Misc", 
+                              author=person(family="World Values Survey Association"),
+                              title="Fieldwork and Sampling",
+                              year=2015,
+                              url="http://www.worldvaluessurvey.org/WVSContents.jsp")
+
+# 
+# Original WVS Data File, Size 1.4GB
+#
+#dataFile <- "C:/Users/Dan/Downloads/WorldValuesSurvey/WVS_Longitudinal_1981-2014_rdata_v_2015_04_18/WVS_Longitudinal_1981_2014_R_v2015_04_18.rdata"
+#load(dataFile)
+#colsToKeep <- c("E234", "S020",  "S024", "S003", "X003", "X025", "A006")
+#WVS_Subset <- WVS_Longitudinal_1981_2014_R_v2015_04_18[,colsToKeep]
+#save(WVS_Subset, file="C:/Code/R/IS606-ProbStats/FinalProject/data/WVS_subData.RData")
+```
+
+```{r}
+# load data
+dataFile <- "C:/Code/R/IS606-ProbStats/FinalProject/data/WVS_subData.RData"
+load(dataFile)
+colnames(WVS_Subset) <- c("KeyQuestion",
+                          "Year", 
+                          "CountryWave", 
+                          "Country", 
+                          "Age", 
+                          "HighestEducation",
+                          "ReligionImportant")
+# Subset to just United States
+WVS_US <- WVS_Subset[WVS_Subset$Country == 840, ]
+WVS_US$CountryName <- "United States"
+
+summary(WVS_US)
+```
+
+
+### Part 1 - Introduction:
+
+
+### Part 2 - Data:
+
+
+### Part 3 - Exploratory data analysis:
+
+
+### Part 4 - Inference:
+
+
+### Part 5 - Conclusion: 
+
+
+### References:
+
+```{r, results='asis', echo=FALSE}
+BibOptions(style="html", bib.style="authortitle")
+bibliography()
+```
+
+### Appendix (optional):
+
+Remove this section if you don't have an appendix
+
