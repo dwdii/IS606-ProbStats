@@ -13,9 +13,31 @@ myTheme <- theme(axis.ticks=element_blank(),
                   panel.grid.major.x=element_line(color="white", size=0.5),
                   plot.title=element_text(size="10"))
 ```
-### 5.6
+### 5.6 Working Backwards, Part II (p257)
+
+**A 90% confidence interval for a population mean is (65, 77). The population distribution is approx. normal and the population standard deviation is unknown. This confidence interval is based on a simple random sample of 25 observations. Calculate the sample mean, the margin of error and the sample standard deviation.**
 
 
+First we can work out the sample mean, by finding the mid point of the confidence interval range. We also get the T * SE segment of the confidence interval equation out of these computations.
+
+```{r}
+n <- 25
+diff <- 77 - 65
+TxSE <- diff / 2
+
+mean56 <- 65 + TxSE
+mean56
+```
+
+Next we need to resolve the t value for a 90% confidence interval of n=25, df=24:
+
+```{r}
+df <- n - 1
+t <- qt(.1, df)
+
+t
+
+```
 
 ### 5.14
 
