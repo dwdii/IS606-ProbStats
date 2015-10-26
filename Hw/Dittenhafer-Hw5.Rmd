@@ -23,23 +23,63 @@ First we can work out the sample mean, by finding the mid point of the confidenc
 ```{r}
 n <- 25
 diff <- 77 - 65
-TxSE <- diff / 2
+marginOfError <- diff / 2
 
-mean56 <- 65 + TxSE
+mean56 <- 65 + marginOfError
 mean56
 ```
 
-Next we need to resolve the t value for a 90% confidence interval of n=25, df=24:
+Next we need to resolve the t value for a 90% confidence interval of n=25, df=24. We use the `qt` function to look up the t value in the t distribution for the \(1 - \alpha / 2 = 0.95\) where \(\alpha = 1 - CI = 0.10\):
 
 ```{r}
 df <- n - 1
-t <- qt(.1, df)
-
+t <- qt(.95, df)
 t
-
 ```
 
-### 5.14
+With the t value, we can separate the standard error:
+
+```{r}
+SE <- marginOfError / t
+SE
+```
+
+With the standard error and the number of cases we can back into the sample standard deviation:
+
+```{r}
+sdSample <- SE * sqrt(n)
+sdSample
+```
+
+### 5.14 SAT Scores (p259)
+
+***SAT Scores of students at an Ivy League college are distributed with a standard deviation of 250 points. Two statistitcs students, Raina and Luke, want to estimate the average SAT score of students at this college as part of a class project.  They want their margin of error to be no more than 25 points.***
+
+#### a) Raina wants to use a 90% confidence interval. How large of a sample should she collect?
+
+Using the normal distribution Z score, we can compute the sample size needed as follows:
+
+```{r}
+mE <- 25
+S <- 250
+z <- qnorm(0.95)
+z
+n <- ((S * z) / mE)^2
+n
+```
+
+#### b) Luke wants to use a 99% confidence interval. Without calculating the actual sample size, determine whether his sample should be larger or smaller than Raina's, and explain your reasoning.
+
+In order to achieve a 99% confidence interval while maintaining the margin of error of 25 points, a larger sample size will be needed sufficient to offset the increased Z score associated with the 99% CI.
+
+#### c) Calculate the minimum required sample size for Luke.
+
+```{r}
+z <- qnorm(0.995)
+z
+n <- ((S * z) / mE)^2
+n
+```
 
 ### 5.20
 
