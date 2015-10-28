@@ -1,0 +1,27 @@
+---
+title: "IS606 Homework 6"
+author: "Daniel Dittenhafer"
+date: "October 27, 2015"
+output: pdf_document
+---
+```{r, echo=FALSE} 
+library(ggplot2)
+myTheme <- theme(axis.ticks=element_blank(),  
+                  panel.border = element_rect(color="gray", fill=NA), 
+                  panel.background=element_rect(fill="#FBFBFB"), 
+                  panel.grid.major.y=element_line(color="white", size=0.5), 
+                  panel.grid.major.x=element_line(color="white", size=0.5),
+                  plot.title=element_text(size="10"))
+```
+
+### 6.6
+
+### 6.12
+
+### 6.20
+
+### 6.28
+
+### 6.44
+
+### 6.48
