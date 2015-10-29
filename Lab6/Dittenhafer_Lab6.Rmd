@@ -137,6 +137,24 @@ the error margin for surveys of this kind is $\pm$ 3-5% at 95% confidence".
     conditions for inference are met. It may be helpful to create new data 
     sets for each of the two countries first, and then use these data sets in 
     the `inference` function to construct the confidence intervals.
+    
+    ***First we examine France. As you will see, the success/failure counts are above 10. Again, we accept the cases are independent based on being less than 10% of the population of France.***
+    
+    ```{r}
+    fr12 <- subset(atheism, nationality == "France" & year == "2012")
+    
+    inference(fr12$response, est = "proportion", type = "ci", method = "theoretical", 
+          success = "atheist")   
+    ```
+    
+    ***Secondly, we examine Brazil As you will see, the success/failure counts are above 10. Again, we accept the cases are independent based on being less than 10% of the population of Brazil***
+    
+    ```{r}
+    br12 <- subset(atheism, nationality == "Brazil" & year == "2012")
+    #summary(sk12)
+    inference(br12$response, est = "proportion", type = "ci", method = "theoretical", 
+          success = "atheist")   
+    ```    
 
 ## How does the proportion affect the margin of error?
 
@@ -159,7 +177,7 @@ error (`me`) associated with each of these values of `p` using the familiar
 approximate formula ($ME = 2 \times SE$). Lastly, we plot the two vectors 
 against each other to reveal their relationship.
 
-```{r me-plot, eval=FALSE}
+```{r me-plot, eval=TRUE}
 n <- 1000
 p <- seq(0, 1, 0.01)
 me <- 2 * sqrt(p * (1 - p)/n)
@@ -167,6 +185,8 @@ plot(me ~ p, ylab = "Margin of Error", xlab = "Population Proportion")
 ```
 
 8.  Describe the relationship between `p` and `me`.
+
+***As p increases from 0 - .5, me also increases to a maximum ~ 0.03. Between 0.5 - 1, as p increases me decreases back to 0.***
 
 ## Success-failure condition
 
@@ -215,6 +235,8 @@ distribution.
     $p = 0.1$. Be sure to note the center, spread, and shape.\
     *Hint:* Remember that R has functions such as `mean` to calculate summary
     statistics.
+    
+    ***The samplng distribution of sample proportions is centered near 0.1, the population proportion. It has a spread of ~0.025, is unimodel and is normally shaped***
 
 10. Repeat the above simulation three more times but with modified sample
     sizes and proportions: for $n = 400$ and $p = 0.1$, $n = 1040$ and 
@@ -224,6 +246,60 @@ distribution.
     larger two-by-two plot. Describe the three new sampling distributions. 
     Based on these limited plots, how does $n$ appear to affect the 
     distribution of $\hat{p}$? How does $p$ affect the sampling distribution?
+    
+```{r sim-np0, eval=TRUE}
+par(mfrow = c(2, 2))
+
+p <- 0.1
+n <- 1040
+p_hats <- rep(0, 5000)
+
+for(i in 1:5000){
+  samp <- sample(c("atheist", "non_atheist"), n, replace = TRUE, prob = c(p, 1-p))
+  p_hats[i] <- sum(samp == "atheist")/n
+}
+
+hist(p_hats, main = "p = 0.1, n = 1040", xlim = c(0, 0.18))
+
+p <- 0.1
+n <- 400
+p_hats <- rep(0, 5000)
+
+for(i in 1:5000){
+  samp <- sample(c("atheist", "non_atheist"), n, replace = TRUE, prob = c(p, 1-p))
+  p_hats[i] <- sum(samp == "atheist")/n
+}
+
+hist(p_hats, main = "p = 0.1, n = 400", xlim = c(0, 0.18))
+
+p <- 0.02
+n <- 1040
+p_hats <- rep(0, 5000)
+
+for(i in 1:5000){
+  samp <- sample(c("atheist", "non_atheist"), n, replace = TRUE, prob = c(p, 1-p))
+  p_hats[i] <- sum(samp == "atheist")/n
+}
+
+hist(p_hats, main = "p = 0.02, n = 1040", xlim = c(0, 0.18))
+
+p <- 0.02
+n <- 400
+p_hats <- rep(0, 5000)
+
+for(i in 1:5000){
+  samp <- sample(c("atheist", "non_atheist"), n, replace = TRUE, prob = c(p, 1-p))
+  p_hats[i] <- sum(samp == "atheist")/n
+}
+
+hist(p_hats, main = "p = 0.02, n = 400", xlim = c(0, 0.18))
+```
+
+***All 4 distributions are fairly normal in shape. The change in p shifts the location of the curve to center around the population value, as we would expect. The change in n affects the spread of the distribution. The greater the n, the smaller the spread.***
+
+```{r}
+par(mfrow = c(1,1))
+```
 
 Once you're done, you can reset the layout of the plotting window by using the 
 command `par(mfrow = c(1, 1))` command or clicking on "Clear All" above the 
@@ -236,6 +312,27 @@ your previous plots.
     these point estimates are actually the truth. Then given the shape of 
     their respective sampling distributions, do you think it is sensible to 
     proceed with inference and report margin of errors, as the reports does?
+    
+    ```{r}
+    # Austrailia ME
+    p <- 0.1
+    n <- 1040
+    me <- 2 * sqrt(p * (1 - p)/n)
+    me
+    # Ecuador ME
+    p <- 0.02
+    n <- 400
+    me <- 2 * sqrt(p * (1 - p)/n)
+    me
+    ```
+    ***The margin's of error are interestingly similar. The following chart shows how n affects margin of error with a fixed proportion of 0.5. Interestingly, n >= 200, the affect is minimal, so the change from 400 to 1040 is not significant, but as shown in the chart above ME vs P, the change in p from 0.02 to 0.1 is more significant. Either way, reporting margin or error of +- 3-5% seems conservative to me after seen this analysis. The lowest n I saw in the data was n=200 for South Africa.***
+    
+    ```{r}
+    n <- seq(0, 1000, 1)
+    p <- 0.5
+    me <- 2 * sqrt(p * (1 - p)/n)
+    plot(me ~ n, ylab = "Margin of Error", xlab = "N")
+    ```
 
 * * *
 ## On your own
@@ -254,14 +351,54 @@ from 2005 and 2012 for 39 countries.
     *Hint:* Create a new data set for respondents from Spain. Form
     confidence intervals for the true proportion of athiests in both
     years, and determine whether they overlap.
+    
+    \(H_0: \mu_{2005} - \mu_{2012} = 0\)
+
+    \(H_a: \mu_{2005} - \mu_{2012} \ne 0\)
+    
+    ***Both 2005, and 2012 have 1045+ cases which is less than 10% of the population. Both years also have success and failure counts > 10.***
+    
+    ```{r}
+    sp <- subset(atheism, nationality == "Spain")
+    sp2005 <- sp[sp$year == 2005,]
+    nrow(sp2005)
+    sp2012 <- sp[sp$year == 2012,]
+    nrow(sp2012)
+    
+    inference(sp2005$response, est = "proportion", type = "ci", method = "theoretical", 
+          success = "atheist")   
+    
+    inference(sp2012$response, est = "proportion", type = "ci", method = "theoretical", 
+          success = "atheist")    
+    ```
+    
+    ***In 2005, Spain's atheist confidence interval is  0.083 - 0.1177. In 2012, it is  0.0734 - 0.1065. Due to the overlap of confidence intervals, I conclude that there is not a statistically significant difference, but instead could be due to chance.***
 
     **b.** Is there convincing evidence that the United States has seen a
     change in its atheism index between 2005 and 2012?
+    
+    ```{r}
+    us <- subset(atheism, nationality == "United States")
+    us2005 <- us[us$year == 2005,]
+    nrow(us2005)
+    us2012 <- us[us$year == 2012,]
+    nrow(us2012)
+    
+    inference(us2005$response, est = "proportion", type = "ci", method = "theoretical", 
+          success = "atheist")   
+    
+    inference(us2012$response, est = "proportion", type = "ci", method = "theoretical", 
+          success = "atheist")    
+    ```    
+    
+    ***In 2005, the confidence interval of atheism is 0.0038 - 0.0161. In 2012, it is 0.0364 - 0.0634. In this case, there is no overlap, and I conclude that this is convincing evidence that the Unites States saw a change in its atheism index between 2005 and 2012.***
 
 -   If in fact there has been no change in the atheism index in the countries 
     listed in Table 4, in how many of those countries would you expect to 
     detect a change (at a significance level of 0.05) simply by chance?\
     *Hint:* Look in the textbook index under Type 1 error.
+    
+    ***When doing a proper hypothesis test at \(\alpha=0.05\), we would expect to detect a change 95% of the time, and fail to detect a change 5% of the time.***
 
 -   Suppose you're hired by the local government to estimate the proportion of 
     residents that attend a religious service on a weekly basis. According to 
@@ -271,6 +408,16 @@ from 2005 and 2012 for 39 countries.
     guidelines?\
     *Hint:* Refer to your plot of the relationship between $p$ and margin of 
     error. Do not use the data set to answer this question.
+    
+    ***The worst case $p$ would for a margin of error would be 0.5, so we will use this as a basis to compute the required n value. At 95% confidence level, using Z=1.96, we would need to survey 9604 people.***
+    
+    ```{r}
+    p <- 0.5
+    me <- 0.01
+
+    n <- (p - p^2) / (me / 1.96)^2
+    n
+    ```
 
 
 <div id="license">
