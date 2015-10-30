@@ -40,7 +40,7 @@ Take a moment to review the report then address the following questions.
     we assume about the sampling method? Does that seem like a reasonable 
     assumption?
     
-    ***The sampling method must not be biased and must be representative of all people in the world.***
+    ***The sampling method must not be biased and must be representative of all people in the world. Due to the fact that each country represented generally has a sample size of ~1000, larger countries and small countries are not represented proportionally which could cause the global aggregate result to be skewed/biased depending on how the aggregates are computed.***
 
 ## The data
 
@@ -79,7 +79,17 @@ us12 <- subset(atheism, nationality == "United States" & year == "2012")
 
 ```{r}
 summary(us12)
+
+atheist <- nrow(us12[us12$response == "atheist", ])
+atheist
+
+total <- nrow(us12)
+total
+
+atheist / total
 ```
+
+After rounding, the document's table 6 value for the US is the same.
 
 ## Inference on proportions
 
@@ -325,7 +335,7 @@ your previous plots.
     me <- 2 * sqrt(p * (1 - p)/n)
     me
     ```
-    ***The margin's of error are interestingly similar. The following chart shows how n affects margin of error with a fixed proportion of 0.5. Interestingly, n >= 200, the affect is minimal, so the change from 400 to 1040 is not significant, but as shown in the chart above ME vs P, the change in p from 0.02 to 0.1 is more significant. Either way, reporting margin or error of +- 3-5% seems conservative to me after seen this analysis. The lowest n I saw in the data was n=200 for South Africa.***
+    ***The margin's of error are interestingly similar. The following chart shows how n affects margin of error with a fixed proportion of 0.5. Interestingly, n >= 200, the affect is minimal, so the change from 400 to 1040 is not significant, but as shown in the chart above ME vs P, the change in p from 0.02 to 0.1 is more significant. Either way, reporting margin of error of +- 3-5% seems conservative to me at the individual country level after seeing this analysis. With that said, it does seem inaccurate.***
     
     ```{r}
     n <- seq(0, 1000, 1)
@@ -372,7 +382,7 @@ from 2005 and 2012 for 39 countries.
           success = "atheist")    
     ```
     
-    ***In 2005, Spain's atheist confidence interval is  0.083 - 0.1177. In 2012, it is  0.0734 - 0.1065. Due to the overlap of confidence intervals, I conclude that there is not a statistically significant difference, but instead could be due to chance.***
+    ***In 2005, Spain's atheist 95% confidence interval is  0.083 - 0.1177. In 2012, it is  0.0734 - 0.1065. Due to the overlap of confidence intervals, I conclude that there is not a statistically significant difference, but instead could be due to chance.***
 
     **b.** Is there convincing evidence that the United States has seen a
     change in its atheism index between 2005 and 2012?
@@ -391,14 +401,14 @@ from 2005 and 2012 for 39 countries.
           success = "atheist")    
     ```    
     
-    ***In 2005, the confidence interval of atheism is 0.0038 - 0.0161. In 2012, it is 0.0364 - 0.0634. In this case, there is no overlap, and I conclude that this is convincing evidence that the Unites States saw a change in its atheism index between 2005 and 2012.***
+    ***In 2005, the 95% confidence interval of U.S. atheism is 0.0038 - 0.0161. In 2012, it is 0.0364 - 0.0634. In this case, there is no overlap, and I conclude that this is convincing evidence that the Unites States saw a change in its atheism index between 2005 and 2012.***
 
 -   If in fact there has been no change in the atheism index in the countries 
     listed in Table 4, in how many of those countries would you expect to 
     detect a change (at a significance level of 0.05) simply by chance?\
     *Hint:* Look in the textbook index under Type 1 error.
     
-    ***When doing a proper hypothesis test at \(\alpha=0.05\), we would expect to detect a change 95% of the time, and fail to detect a change 5% of the time.***
+    ***When doing a proper hypothesis test at \(\alpha=0.05\), we would expect to correctly detect a change 95% of the time, and fail to detect a change 5% of the time.***
 
 -   Suppose you're hired by the local government to estimate the proportion of 
     residents that attend a religious service on a weekly basis. According to 
