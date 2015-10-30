@@ -74,6 +74,8 @@ In order to achieve a 99% confidence interval while maintaining the margin of er
 
 #### c) Calculate the minimum required sample size for Luke.
 
+First we lookup the Z score associated with a 99% confidence interval. Then we can calcuate the sample size needed to acheive Luke's goal.
+
 ```{r}
 z <- qnorm(0.995)
 z
