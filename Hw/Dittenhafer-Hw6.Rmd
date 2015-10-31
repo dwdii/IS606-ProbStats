@@ -110,6 +110,129 @@ ci95
 
 The 95% confidence interval on the difference in proportions between CA and OR is `r ci95$lb` - `r ci95$ub`. This interval overlaps 0, therefore we can conclude with a 95% confidence level that the proportions are not statistically different. In other words, CA and OR population proportion might be equal given the results from this sample.
 
-### 6.44
+### 6.44 Barking Deer (p323)
 
-### 6.48
+*Microhabitat factors associated with forage and bed sites of barking deer in Hainan Island, China were examined from 2001 to 2002. In this region, woods make up 4.8% of the land, cultivated grass plot makes up 14.7% and deciduous forests makes up 39.6%. Of the 426 sites where the deer forage, 4 were categorized as woods, 16 as cultivated grassplot, and 61 as deciduous forests The table below summarizes there data.*
+
+Woods | Cultivated grassplot | Deciduous Forests | Other | Total |
+------|----------------------|-------------------|-------|-------|
+4     | 16                   | 67                | 345   | 426   |
+
+
+#### a) Write the hypotheses for testing if barking deer prefer to forage in certain habitats over others.
+
+The hypotheses associated with testing if barking deer prefer to forage in certain habitats follows:
+
+\(H_0: \text{ The sites where barking deer forage were distributed according to the portion of land in each habitat.} \)
+
+\(H_a: \text{ The sites where barking deer forage is not evely distributed across the habitiats of the region.} \)
+
+\(\alpha=0.05\)
+
+The null hypothesis even distribution is shown in the table below:
+
+Woods | Cultivated grassplot | Deciduous Forests | Other | Total |
+------|----------------------|-------------------|-------|-------|
+20.45 | 62.62                | 168.70            | 174.23| 426   |
+
+
+#### b) What type of test care we use to answer this research question?
+
+We can use a Chi-square test for one-way table.
+
+#### c) Check if the assumptions and conditions required for this test are satisfied.
+
+Conditions and assumptions are described below:
+
+**Independence:** Are the cases independent? We will have to assume so since no assertion is given in the description.
+
+**Sample size / distribution:** In our expected cases scenario related to the null hypothesis, all habitats have at least 5 expected cases, therefore this condition is satisfied.
+
+#### d) Do these data provide convincing evidence that barking deer prefer to forage in certain habitats over others? Conduct an appropriate hypothesis test to answer this research question.
+
+The following `R` code works through the hypothesis test: 
+
+```{r}
+habitats <- c(4, 16, 67, 345)
+expected <- c(20.45, 62.62, 168.70, 174.23)
+k <- length(habitats)
+df <- k - 1
+# Loop over the bin values to compute the chi2 test statistic
+chi2 <- 0
+for(i in 1:length(habitats))
+{
+  chi2 <- chi2 + ((habitats[i] - expected[i])^2 / expected[i])
+}
+chi2
+# Anyway, now check the chi2 test statistic and lookup p-val
+pVal <- pchisq(chi2, df=df, lower.tail=FALSE)
+pVal
+```
+
+The \(\chi^2\) value is so large the p-value is effectively 0. I conclude there is convincing evidence the barking deer forage in certain habitats over others.
+
+### 6.48 Coffee and Depression (p325)
+
+*Researchers conducted a study investigating the relationship between caffeinated coffee consumption and risk of depression in women. They collected data on 50,739 women free of depression symptons at the start of the study in the year 1996, and these women were followed through 2006. The researchers used questionaires to collect data on caffeinated coffee consumption, asked each individual about physician-diagnosed depression, and also asked about the use of antidepressants. The table below shows the distribution of incidences of depression by amount of caffeinated coffee consumption.*
+
+Depression | \(\leq\)  1 cup/wk | 2-6 cups/wk | 1 cup/day | 2-3 cups/day | \(\geq 4\) cups/day | Total |
+-----------|--------------------|-------------|-----------|--------------|---------------------|-------|
+Yes        | 670                | **373**     | 905       | 564          | 95                  | 2,607 |
+No         | 11,545             | 6,244       | 16,329    | 11,726       | 2,288               | 48,132|
+Total      | 12,215             | 6,617       | 17,234    | 12,290       | 2,383               | 50,739|
+
+
+
+#### a) What type of test is appropriate for evaluating if there is an association between coffee intake and depression?
+
+The Chi-squared test for two-way tables is appropriate for evaluating if there is an association between coffee intake and depression.
+
+#### b) Write the hypotheses for the test you identified in part (a).
+
+The hypotheses for the Chi-squared two-way table test are as follows.
+
+\(H_0: \text{ There is no association between caffeinated coffee consumption and depression. }\)
+
+\(H_a: \text{ There is an association between caffeinated coffee consumption and depression. }\)
+
+#### c) Calculate the overall proportion of women who do and do not suffer from depression.
+
+The overall proportion of women who do suffer from depression is 5.14%. The overall proportion of women who do not suffer from depression is 94.86%
+
+#### d) Identify the expected count for the highlighted cell, and calculate the contribution of this cell to the test statistic, i.e.(Observed - Expected)2 / Expected.
+
+The expected counts for the two-way table are shown below:
+
+Depression | \(\leq\)  1 cup/wk | 2-6 cups/wk | 1 cup/day | 2-3 cups/day | \(\geq 4\) cups/day | Total |
+-----------|--------------------|-------------|-----------|--------------|---------------------|-------|
+Yes        | 627.851            | 340.1138    | 885.8276  | 631.706      | 122.4862            | 5.14% |
+No         | 11,587.149         | 6,276.8862  | 16,348.1724| 11,658.294  | 2,260.5138          | 94.86%|
+Total      | 12,215             | 6,617       | 17,234    | 12,290       | 2,383               | 100%  |
+
+```{r}
+k <- 5
+df <- k - 1
+
+expCnt <- 340.1138
+cellContrib <- (373 - expCnt)^2 / expCnt
+```
+
+The contribution to the test statistic for the highlighted cell is `r cellContrib`.
+
+#### e) The test statistic is \(\chi^2 = 20.93\). What is the p-value?
+
+We lookup the p-value using the `pchisq` function:
+
+```{r}
+pVal <- pchisq(20.93, df=df, lower.tail=FALSE)
+pVal
+```
+
+#### f) What is the conclusion of the hypothesis test?
+
+Based on the p-value of ~ 0.0003 is less than 0.05, I conclude there is an association between caffeinated coffee consumption and depression.
+
+
+#### g) One of the authors of this study was quoted on the NYTimes as saying it was "too early to recommend that women load up on extra coffee" based on just this study. Do you agree with this statement? Explain your reasoning.
+
+I do agree with the statement. One study can provide an interesting theory, but peer review and replicating the results would lend more support to the conclusion. Additionally, additional caffeine might be other adverse affects on women not accounted for in this study.
