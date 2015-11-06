@@ -14,9 +14,92 @@ myTheme <- theme(axis.ticks=element_blank(),
                   plot.title=element_text(size="10"))
 ```
 
-### 7.24
+### 7.24 Nutrition at Starbucks, Part I (p363)
 
-### 7.26
+#### a) Describe the relationship between number of calories and amount of carbohydrates (in grams) that Starbucks food menu items contain.
+
+Calories and carbohydrates have a positive relationship. As calories increase, so do carbohydrates.
+
+#### b) In this scenario, what are the explanatory and response variables?
+
+The explanatory variable is Calories on the x axis, and the response variable is Carbohydrates on the y axis.
+
+#### c) Why might we want to fit a regression line to these data?
+
+We might be interested in predicting the number of carbohydrates in a particular food item based on the number of calories.
+
+
+#### d) Do these data meet the conditions required for fitting a least squares line?
+
+* **Linearity**: The data is not clearly linear, but there does appear to a general trend. It appears more fan-like than linear.
+
+* **Nearly normal residuals**: The residuals distribution appears nearlly normal. 
+
+* **Constant variability**: I don't think I would go so far as constant variability. The residuals on the left of the Residuals scatterplot (lower calories) are smaller, and trend larger as we move up the calories axis.
+
+* **Independent observations**: Each menuitem is presumably independent of the next, but they are all Starbucks menu items (as opposed to separate vendors). 
+
+In conclusion, the data don't seem to sufficiently meet the conditions for fitting a least squares line due primarily to non-satisfaction of the Linearity and Constant Variability conditions.
+
+
+
+### 7.26 Body measurements, Part III (p364)
+
+Mean shoulder girth is 107.20 cm. Standard deviation: 10.37 cm. 
+Mean height is 171.14. Standard deviation: 9.41 cm. 
+Correlation between height and shoulder girth is 0.67.
+
+#### a) Write the equation of the regression line for predicting height.
+
+First we compute the Beta estimates:
+
+```{r}
+b1 <- (9.41 / 10.37) * 0.67
+b0 <- (b1 * (0 - 107.2)) + 171.14
+```
+
+\[\hat{y} = `r b0` + `r b1`x\]
+
+#### b) Interpret the slope and the intercept in this context.
+
+The intercept is the height in centimeters at girth of 0 cm. The slope is the number of of centimeters increase in height for each increase in shoulder girth.
+
+
+#### c) Calculate \(R^2\) of the regression line for predicting height from shoulder girth, and interpret it in the context of the application.
+
+First compute the \(R^2\) using the given correlation value:
+
+```{r}
+R2 <- 0.67^2
+```
+
+The \(R^2=`r R2`\). This means the linear model explains ~45% of the variation of the height data.
+
+#### d) A randomly selected student from your class has a shoulder girth of 100cm. Predict the height of this student using the model.
+
+First we define a function of the model, then call it to get our prediction:
+
+```{r}
+heightFromShoulderGirth <- function(girth)
+{
+  height <- b0 + b1 * girth
+  return(height)
+}
+
+predHeight <- heightFromShoulderGirth(100)
+predHeight
+```
+
+
+#### e) A one year old has a shoulder girth of 56cm. Would it be appropriate to use this linear model to predict the height of this child?
+
+Using the previously defined function, we get the predicted value out of interest. Given the data set's lowest shoulder girth value was > 80cm, any value below this boundary may not be handled appropriately. In addition, a one year old is much different than physically active individuals which were the basis for the sample. In conclusion, I don't believe it would be appropriate to use this linear model to predict the height of this child.
+
+```{r}
+predHeight <- heightFromShoulderGirth(56)
+predHeight
+```
+
 
 ### 7.30
 
