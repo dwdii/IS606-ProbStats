@@ -101,7 +101,32 @@ predHeight
 ```
 
 
-### 7.30
+### 7.30 Cats, Part I (p365)
+
+#### a) Write out the linear model.
+
+\[\hat{y} = -0.357 + 4.034x\]
+
+#### b) Interpret the intercept
+
+The value -0.357 tells us the model will predict a negative heart weight when the cat's body height is 0. This of course doesn't make any sense since the heart is part of the body, therefore this value is not meaningful when standing alone. 
+
+#### c) Interpret the slope
+
+The slope of 4.034 tells us that the heart weight increases by 4.034 grams for each 1kg of body weight increase.
+
+#### d) Interpret \(R^2\)
+
+The \(R^2=64.66\)% tells us that the linear model describes 64.66% of the variation in the heart weight.
+
+#### e) Calculate the correlation coefficient.
+
+The correlation coefficient would be the square root of the \(R^2\) value.
+
+```{r}
+r <- sqrt(0.6466)
+r
+```
 
 ### 7.40
 
