@@ -31,13 +31,13 @@ We might be interested in predicting the number of carbohydrates in a particular
 
 #### d) Do these data meet the conditions required for fitting a least squares line?
 
-* **Linearity**: The data is not clearly linear, but there does appear to a general trend. It appears more fan-like than linear.
+* **Linearity**: The data is not clearly linear, but there does appear to be a general trend. It appears more fan-like than linear.
 
-* **Nearly normal residuals**: The residuals distribution appears nearlly normal. 
+* **Nearly normal residuals**: The residuals distribution appears nearly normal. 
 
 * **Constant variability**: I don't think I would go so far as constant variability. The residuals on the left of the Residuals scatterplot (lower calories) are smaller, and trend larger as we move up the calories axis.
 
-* **Independent observations**: Each menuitem is presumably independent of the next, but they are all Starbucks menu items (as opposed to separate vendors). 
+* **Independent observations**: Each menu item is presumably independent of the next, but they are all Starbucks menu items (as opposed to separate vendors). 
 
 In conclusion, the data don't seem to sufficiently meet the conditions for fitting a least squares line due primarily to non-satisfaction of the Linearity and Constant Variability conditions.
 
@@ -62,7 +62,7 @@ b0 <- (b1 * (0 - 107.2)) + 171.14
 
 #### b) Interpret the slope and the intercept in this context.
 
-The intercept is the height in centimeters at girth of 0 cm. The slope is the number of of centimeters increase in height for each increase in shoulder girth.
+The intercept is the height in centimeters at girth of 0 cm. The slope is the number of centimeters increase in height for each increase in shoulder girth.
 
 
 #### c) Calculate \(R^2\) of the regression line for predicting height from shoulder girth, and interpret it in the context of the application.
@@ -132,7 +132,7 @@ r
 
 #### a) Given that the average standardized beauty score is -0.0883 and average teaching evaluation score is 3.9983, calculate the slope. Alternatively, the slope may be computed using just the information provided in the model summary table.
 
-Using an algebraic manipulation of the slope, intercept from of the linear model in `R` code:
+Using an algebraic manipulation of the slope, intercept form of the linear model in `R` code:
 
 ```{r}
 b1 <- (3.9983 - 4.010) / -0.0883 
