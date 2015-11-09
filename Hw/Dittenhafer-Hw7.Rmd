@@ -128,6 +128,30 @@ r <- sqrt(0.6466)
 r
 ```
 
-### 7.40
+### 7.40 Rate my professor (p369)
 
+#### a) Given that the average standardized beauty score is -0.0883 and average teaching evaluation score is 3.9983, calculate the slope. Alternatively, the slope may be computed using just the information provided in the model summary table.
+
+Using an algebraic manipulation of the slope, intercept from of the linear model in `R` code:
+
+```{r}
+b1 <- (3.9983 - 4.010) / -0.0883 
+b1
+```
+
+We find our estimate of \(\beta_1 = `r b1`\).
+
+#### b) Do these data provide convincing evidence that the slope of the relationship between teaching evaluation and beauty is positive? Explain your reasoning.
+
+Given the p-value for the slope is \(\approx 0.0000\), this provides strong evidence that the slope is not 0 on a two tail test. Looking at the positive t-value of 4.13 and half the two-tail p-value (still very close to zero), this provides strong evidence of a positive relationship between teaching evaluationa and beauty.
+
+#### c) List the conditions required for linear regression and check if each one is satisfied for this model based on the following diagnostic plots.
+
+* **Linearity**: There is a weak trend in the scatterplot. We are not provided the correlation coefficient nor the \(R^2\), therefore we will accept, with concerns, the linearity condition is satisfied.
+
+* **Nearly normal residuals**: As shown in the residuals distribution and Q-Q plot, they are in fact nearly normal. 
+
+* **Constant variability**: The scatterplot of the residuals does appear to have constant variability.
+
+* **Independent observations**: Assuming independence due to no clear evidence one way or the other. 463 professors would likely be < 10% of nationwide professors, so this is a plus.
 
