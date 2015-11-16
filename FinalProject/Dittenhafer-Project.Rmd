@@ -11,7 +11,7 @@ output: pdf_document
 # OR ASK FOR HELP
 library(knitr)
 ## set global chunk options
-opts_chunk$set(fig.path='figure/manual-', cache.path='cache/manual-', fig.align='center', fig.show='hold', par=TRUE)
+opts_chunk$set(fig.path='figure/manual-', cache.path='cache/manual-', fig.show='hold', par=TRUE)
 ## tune details of base graphics (http://yihui.name/knitr/hooks)
 knit_hooks$set(par=function(before, options, envir){
 if (before && options$fig.show!='none') par(mar=c(4,4,.2,.1),cex.lab=.95,cex.axis=.9,mgp=c(2,.7,0),tcl=-.3)
@@ -40,6 +40,29 @@ bibWvsFieldworkSampling <- bibentry(bibtype="Misc",
                               year=2015,
                               url="http://www.worldvaluessurvey.org/WVSContents.jsp")
 
+bibPewViewsOnScience <- bibentry(bibtype="Misc", 
+                                 author=c(person(family="Funk", given="Cary"), person(family="Rainee", given="Lee")),
+                                 title="Public and Scientists’ Views on Science and Society",
+                                 year=2015,
+                              url="http://www.pewinternet.org/2015/01/29/public-and-scientists-views-on-science-and-society/")
+
+```
+
+
+### Part 1 - Introduction:
+
+How have the values of people from the United States changed over time with regard to science and technology and its positive/negative impact on the world? The World Values Survey includes a question where in the survey respondent is asked to characterize their view of science and state of the world because of it `r citep(bibWorldValSurvey)`. Using the World Values Survey longitudinal data from 2006 and 2011, this study investigates changes in the views of United States respondents associated with science as well as correlations with educational level and/or the importance of religion.
+
+
+### Part 2 - Data:
+
+The data was collected and made available by the World Values Survey Association. `r  citep(bibWorldValSurvey)`. 
+
+The link to the data page is: http://www.worldvaluessurvey.org/WVSDocumentationWVL.jsp
+
+Although the World Values Survey was conducted in the United States starting in 1995, the question regarding science and the world (005_203) was not introducted until 2006. As such, only the cases from 2006 and beyond, 3481 across 2006 and 2011, are considered in this study.
+
+```{r}
 # 
 # Original WVS Data File, Size 1.4GB
 #
@@ -67,13 +90,6 @@ WVS_US$CountryName <- "United States"
 
 summary(WVS_US)
 ```
-
-
-### Part 1 - Introduction:
-
-
-### Part 2 - Data:
-
 
 ### Part 3 - Exploratory data analysis:
 
