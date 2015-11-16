@@ -227,7 +227,7 @@ abline(h = 0, lty = 3)  # adds a horizontal dashed line at y = 0
 6.  Is there any apparent pattern in the residuals plot? What does this indicate
     about the linearity of the relationship between runs and at-bats?
     
-    **There seems to be more points on the left versus the right side.**
+    **There seems to be more points on the left versus the right side, but generally constant variability with a similar amount of point above and below the line. This suggests a somewhat linear though wide relationship.**
 
 *Nearly normal residuals*: To check this condition, we can look at a histogram
 
@@ -252,7 +252,7 @@ qqline(m1$residuals)  # adds diagonal line to the normal prob plot
 8.  Based on the plot in (1), does the constant variability condition appear to 
     be met?
     
-    **It appears the constand variability condition was be satified.**
+    **It appears the constant variability condition would be satisfied.**
     
 * * *
 
@@ -280,7 +280,7 @@ summary(m3)
     Does your variable seem to predict `runs` better than `at_bats`? How can you
     tell?
     
-**The `stolen_bases \(R^2=0.002914\) which is much lower than the `at_bats` \(R^2=0.3729\). This indicates that the `at_bats` model explains significantly more of the variability of `runs` than `stolen_bases` does.**
+**The `stolen_bases` \(R^2=0.002914\) which is much lower than the `at_bats` \(R^2=0.3729\). This indicates that the `at_bats` model explains significantly more of the variability of `runs` than `stolen_bases` does.**
 
 -   Now that you can summarize the linear relationship between two variables, 
     investigate the relationships between `runs` and each of the other five 
