@@ -1,7 +1,7 @@
 ---
 title: "IS606 Final Project"
 author: "Daniel Dittenhafer"
-date: "October 12, 2015"
+date: "December 7, 2015"
 output: pdf_document
 ---
 ```{r include=FALSE, cache=FALSE}
@@ -49,6 +49,8 @@ bibPewViewsOnScience <- bibentry(bibtype="Misc",
 ```
 
 
+
+
 ### Part 1 - Introduction:
 
 How have the values of people from the United States changed over time with regard to science and technology and its positive/negative impact on the world? The World Values Survey includes a question where in the survey respondent is asked to characterize their view of science and state of the world because of it `r citep(bibWorldValSurvey)`. Using the World Values Survey longitudinal data from 2006 and 2011, this study investigates changes in the views of United States respondents associated with science as well as correlations with educational level and/or the importance of religion.
@@ -56,11 +58,96 @@ How have the values of people from the United States changed over time with rega
 
 ### Part 2 - Data:
 
-The data was collected and made available by the World Values Survey Association. `r  citep(bibWorldValSurvey)`. 
+The World Values Survey is an observational study, and this data project will be analyzing a subset of the observational study conducted by the World Values Survey Association.
+The data was collected and made available by the World Values Survey Association via their website. `r  citep(bibWorldValSurvey)`. 
 
-The link to the data page is: http://www.worldvaluessurvey.org/WVSDocumentationWVL.jsp
+The original data set in its entirety is available from the World Values Survey website: http://www.worldvaluessurvey.org/WVSDocumentationWVL.jsp
 
-Although the World Values Survey was conducted in the United States starting in 1995, the question regarding science and the world (005_203) was not introducted until 2006. As such, only the cases from 2006 and beyond, 3481 across 2006 and 2011, are considered in this study.
+Although the World Values Survey was conducted in the United States starting in 1995, the question regarding science and the world (005_203) was not introducted until 2006. As such, only the cases from 2006 and beyond, 3481 cases across 2006 and 2011, are considered in this study.
+
+#### Scope of Inferencce
+
+Based on the data and collection methods and type of study, we review the scope of inference this data project can claim.
+
+**Generalizability**: The population associated with the survey in this data project is the population of the United States between the ages of 18 and 85. *Is there bias, or is the data not representative of the age range?*
+
+**Causality**: The data is derived from an observational survey and not an experiment. As such, no causality can be established from any conclusion.
+
+#### Variables Included in Data Subset
+
+The following table lists the variables extracted from the original World Values Survey dataset which will be considered in this data project.
+
+ ID | Variable | Description
+--|-----------|------------
+005_203| E234 | The world is better off, or worse off, because of science and technology
+010_023| S020 | Year survey
+010_028| S024 | Country wave
+010_004| S003 | Country/region
+014_003| X003 | Age
+014_030| X025 |	Highest educational level attained
+001_006| A006	| Important in life: Religion
+
+#### Response Variable
+
+The response variable is the answer provided to the key question, "Is the world is better off, or worse off, because of science and technology?"
+
+The answers are categorical in nature, but ordinal in their degree of support for the better/worse outcome. The distinct answer values and the description of each value are shown in the table below.
+
+Value | Description
+------|------------
+1|A lot worse off
+2|2
+3|3
+4|4
+5|5
+6|6
+7|7
+8|8
+9|9
+10|A lot better off
+-5|Missing; Unknown
+-4|Not asked in survey
+-3|Not applicable
+-2|No answer
+-1|Don´t know
+
+#### Explanatory Variable(s)
+
+The explanatory variables considered for analysis are the "Highest educational level attained" value and the "Important in life: Religion" variable. Again, these are categorical variables, but ordinal in terms of level of education and degree of importance of religion. The values and descriptions for each variable follow:
+
+**Highest educational level attained**
+
+Value | Description
+------|------------
+1|Inadequately completed elementary education
+2|Completed (compulsory) elementary education
+3|Incomplete secondary school: technical/vocational type/elementary education, basic vocational qual.
+4|Complete secondary school: technical/vocational type/Secondary, intermediate vocational qualification
+5|Incomplete secondary: university-preparatory type/Secondary, intermediate general qualification
+6|Complete secondary: university-preparatory type/Full secondary, maturity level certificate
+7|Some university without degree/Higher education - lower-level tertiary certificate
+8|University with degree/Higher education - upper-level tertiary certificate
+-5|Missing; Unknown
+-4|Not asked in survey
+-3|Not applicable; No formal education
+-2|No answer
+-1|Don´t know
+
+**Important in life: Religion**
+
+Value | Description
+------|------------
+-5|Missing; Unknown
+-4|Not asked in survey
+-3|Not applicable
+-2|No answer
+-1|Don´t know
+1|Very important
+2|Rather important
+3|Not very important
+4|Not at all important
+
+
 
 ```{r}
 # 
