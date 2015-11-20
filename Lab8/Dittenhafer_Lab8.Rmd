@@ -1,12 +1,23 @@
 ---
 title: "Multiple linear regression"
 output:
+  pdf_document: 
+    fig_width: 4
+    fig_height: 3.5
   html_document:
     css: ./lab.css
     highlight: pygments
     theme: cerulean
-  pdf_document: default
 ---
+```{r, echo=FALSE} 
+library(ggplot2)
+myTheme <- theme(axis.ticks=element_blank(),  
+                  panel.border = element_rect(color="gray", fill=NA), 
+                  panel.background=element_rect(fill="#FBFBFB"), 
+                  panel.grid.major.y=element_line(color="white", size=0.5), 
+                  panel.grid.major.x=element_line(color="white", size=0.5),
+                  plot.title=element_text(size="10"))
+```
 
 ## Grading the professor
 
@@ -36,7 +47,7 @@ data for *Data Analysis Using Regression and Multilevel/Hierarchical Models*
 (Gelman and Hill, 2007).) The result is a data frame where each row contains a 
 different course and columns represent variables about the courses and professors.
 
-```{r load-data, eval=FALSE}
+```{r load-data, eval=TRUE}
 load("more/evals.RData")
 ```
 
@@ -70,14 +81,36 @@ variable         | description
     question posed in the paper is whether beauty leads directly to the
     differences in course evaluations. Given the study design, is it possible to
     answer this question as it is phrased? If not, rephrase the question.
+    
+    **This is an experiment but it uses observational data in both the the treatment (beauty measure), and with the course evaluation (as the response variable). Although the reseach is designed as an experiment, all aspects are extremely subjective any doesn't seem to be a good design for causal inference. A better research question would be whether beauty is correlated with differences in course evaluations.**
 
 2.  Describe the distribution of `score`. Is the distribution skewed? What does 
     that tell you about how students rate courses? Is this what you expected to 
     see? Why, or why not?
+    
+    **The distribution of `score` is skewed left. This suggests students tend to rate fairly high typically. I had not developed any expectation before running the analysis, but I guess I would have assumed a bit more normalness and less skew in the sense that not all professors are as good as others and this should be reflected in the scores.**
+  
+```{r}
+g1 <- ggplot(data=evals) + 
+  geom_histogram(aes(x=score)) + 
+  labs(title="Distribution of Eval Score") +
+  myTheme
+g1
+```
 
 3.  Excluding `score`, select two other variables and describe their relationship 
     using an appropriate visualization (scatterplot, side-by-side boxplots, or 
     mosaic plot).
+    
+```{r}
+g1 <- ggplot(data=evals, aes(x=age, y=bty_avg)) + 
+  geom_point() + 
+  geom_smooth() +
+  labs(title="Scatterplot of Age vs Beauty Average") +
+  myTheme
+g1
+```    
+    
 
 ## Simple linear regression
 
@@ -85,8 +118,12 @@ The fundamental phenomenon suggested by the study is that better looking teacher
 are evaluated more favorably. Let's create a scatterplot to see if this appears 
 to be the case:
 
-```{r scatter-score-bty_avg, eval = FALSE}
-plot(evals$score ~ evals$bty_avg)
+```{r scatter-score-bty_avg, eval = TRUE}
+g1 <- ggplot(data=evals) + 
+  geom_point(aes(x=bty_avg, y=score), position="dodge") + myTheme
+g1
+
+nrow(evals)
 ```
 
 
@@ -94,9 +131,17 @@ Before we draw conclusions about the trend, compare the number of observations
 in the data frame with the approximate number of points on the scatterplot. 
 Is anything awry?
 
+**Approximate number of points in the scatterplot? That would be an awfully poor estimate if I made one. I dont' see anything awry. Maybe I'm missing something. **
+
 4.  Replot the scatterplot, but this time use the function `jitter()` on the
     $y$- or the $x$-coordinate. (Use `?jitter` to learn more.) What was
     misleading about the initial scatterplot?
+    **Ok, so there were duplicate scores that were overlapping in the original plot.**
+    
+    ```{r}
+    plot(jitter(evals$score) ~ jitter(evals$bty_avg))
+    
+    ```
 
 5.  Let's see if the apparent trend in the plot is something more than
     natural variation. Fit a linear model called `m_bty` to predict average
@@ -104,10 +149,31 @@ Is anything awry?
     using `abline(m_bty)`. Write out the equation for the linear model and
     interpret the slope. Is average beauty score a statistically significant
     predictor? Does it appear to be a practically significant predictor?
+    
+    ```{r}
+    m_bty <- lm(evals$score ~ evals$bty_avg)
+    plot(jitter(evals$score) ~ jitter(evals$bty_avg))
+
+    abline(m_bty)
+    summary(m_bty)
+    ```
+    
+    \[\hat{y}=`r m_bty$coefficients[1]` + `r m_bty$coefficients[2]` x \]
+    
+    **Interpreting the slope, for every 1 unit increase in beauty index, the course evaluation would increase by ~0.67. While the p-value is less than 0.05, practically speaking, it is not a significant predictor as evidenced by the \(R^2 \approx 0.03\).**
 
 6.  Use residual plots to evaluate whether the conditions of least squares
     regression are reasonable. Provide plots and comments for each one (see
     the Simple Regression Lab for a reminder of how to make these).
+    
+```{r residuals, eval=TRUE}
+plot(m_bty$residuals ~ evals$bty_avg)
+abline(h = 0, lty = 3)  # adds a horizontal dashed line at y = 0
+```
+ 
+*Nearly normal residuals*: Based on the plot above, the residuals appear to be nearly normal.
+
+*Linearity*: The data are clearly not having a narrow linear relationship. The points are wide in their trend.
 
 ## Multiple linear regression
 
@@ -117,7 +183,7 @@ physical appearance of the professors and the average of these six scores. Let's
 take a look at the relationship between one of these scores and the average 
 beauty score.
 
-```{r bty-rel, eval = FALSE}
+```{r bty-rel, eval = TRUE}
 plot(evals$bty_avg ~ evals$bty_f1lower)
 cor(evals$bty_avg, evals$bty_f1lower)
 ```
@@ -127,7 +193,7 @@ calculated using the individual scores. We can actually take a look at the
 relationships between all beauty variables (columns 13 through 19) using the 
 following command:
 
-```{r bty-rels, eval = FALSE}
+```{r bty-rels, eval = TRUE}
 plot(evals[,13:19])
 ```
 
@@ -140,7 +206,7 @@ In order to see if beauty is still a significant predictor of professor score
 after we've accounted for the gender of the professor, we can add the gender 
 term into the model.
 
-```{r scatter-score-bty_avg_gender, eval = FALSE}
+```{r scatter-score-bty_avg_gender, eval = TRUE}
 m_bty_gen <- lm(score ~ bty_avg + gender, data = evals)
 summary(m_bty_gen)
 ```
