@@ -1,5 +1,6 @@
 ---
 title: "IS606 Final Project"
+subtitle: "United States and Science Values"
 author: "Daniel Dittenhafer"
 date: "December 7, 2015"
 output: pdf_document
