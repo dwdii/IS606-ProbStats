@@ -261,13 +261,12 @@ qqline(m1$residuals)  # adds diagonal line to the normal prob plot
 -   Choose another traditional variable from `mlb11` that you think might be a 
     good predictor of `runs`. Produce a scatterplot of the two variables and fit 
     a linear model. At a glance, does there seem to be a linear relationship?
-    
-```{r}
-g3 <- ggplot(data=mlb11, aes(x=stolen_bases, y=runs)) + geom_point() + myTheme
-g3
-```
 
 **There does _not_ seem to be a linear relationship between `stolen_bases` and `runs`.**
+
+```{r}
+g3 <- ggplot(data=mlb11, aes(x=stolen_bases, y=runs)) + geom_point() + myTheme
+```
 
 ```{r}
 m3 <- lm(runs ~ stolen_bases, data=mlb11)
