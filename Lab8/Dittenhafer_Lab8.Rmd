@@ -207,16 +207,70 @@ after we've accounted for the gender of the professor, we can add the gender
 term into the model.
 
 ```{r scatter-score-bty_avg_gender, eval = TRUE}
-m_bty_gen <- lm(score ~ bty_avg + gender, data = evals)
+m_bty_gen <- lm(score ~ bty_avg + gender, data = evals, y=TRUE)
 summary(m_bty_gen)
 ```
 
 7.  P-values and parameter estimates should only be trusted if the
     conditions for the regression are reasonable. Verify that the conditions
     for this model are reasonable using diagnostic plots.
+    
+    **Nearly normal residuals seem to hold as shown in the QQ plot below.**
+    
+```{r, echo=FALSE}
+qqnorm(m_bty_gen$residuals)
+qqline(m_bty_gen$residuals) 
+```
+
+**The constant variability of residuals is checked via a comparison to the fitted values. As shown in the following visualization, the data appears to satisfy the conditions for regression.**
+
+```{r, echo=FALSE}
+dfResVsFit <- data.frame(residuals=abs(residuals(m_bty_gen)), fittedValue=fitted(m_bty_gen))
+g7b <- ggplot(data=dfResVsFit) +
+  geom_point(aes(x=fittedValue, y=residuals)) + 
+  myTheme + 
+  labs(title="Residuals vs Fitted Values")
+g7b
+```
+
+**Based on code from http://www.statmethods.net/stats/regression.html, we can view a full set of diagnostic plots to verify the conditions:**
+
+```{r, fig.width=7.5, fig.height=5, echo=FALSE}
+# diagnostic plots 
+layout(matrix(c(1,2,3,4),2,2)) # optional 4 graphs/page 
+plot(m_bty_gen)
+```
+
+**When comparing the residuals to the `bty_avg` predictor values, we see there is not specific structure and the residuals are mostly having constant variability. This supports the concept that the residuals are independent.**
+
+```{r, echo=FALSE}
+dfResVsFit <- data.frame(residuals=abs(residuals(m_bty_gen)), bty_avg=evals$bty_avg)
+g7c <- ggplot(data=dfResVsFit) +
+  geom_point(aes(x=bty_avg, y=residuals)) + 
+  myTheme + 
+  labs(title="Residuals vs Bty_avg Values")
+g7c
+```
+
+**Comparing to the `gender` variable, the distribution is slightly different but similar. The difference doesn't appear significant enough to invalidate the model.**
+
+```{r, echo=FALSE}
+dfResVsFit <- data.frame(residuals=abs(residuals(m_bty_gen)), gender=evals$gender)
+g7d <- ggplot(data=dfResVsFit) +
+  geom_boxplot(aes(x=gender, y=residuals)) + 
+  myTheme + 
+  labs(title="Residuals vs Gender Values")
+g7d
+```
 
 8.  Is `bty_avg` still a significant predictor of `score`? Has the addition
     of `gender` to the model changed the parameter estimate for `bty_avg`?
+    
+    **Revisiting the summary of the model we see the parameter estimte for `bty_avg` is now 0.07416 whereas before gender was introduced, the estimate was 0.06664, a `r 0.07416 - 0.06664` increase. Although the parameter estimate changed for `bty_avg`, the t-value is effectively identical and stronger than gender. Seperately, the \(R^2\) is 0.05912 with both `bty_avg` and `gender`, and with only `bty_avg` the \(R^2\) is 0.03502.  Therefore I conclude that adding `gender` to the model is useful, but on the whole, `bty_avg` is not a significant predictor of `score`.**
+    
+```{r, echo=FALSE}
+summary(m_bty_gen)
+```
 
 Note that the estimate for `gender` is now called `gendermale`. You'll see this 
 name change whenever you introduce a categorical variable. The reason is that R 
@@ -237,7 +291,7 @@ the intercept and slope form familiar from simple regression.
 We can plot this line and the line corresponding to males with the following 
 custom function.
 
-```{r twoLines, eval = FALSE}
+```{r twoLines, eval = TRUE}
 multiLines(m_bty_gen)
 ```
 
@@ -245,6 +299,10 @@ multiLines(m_bty_gen)
     males, the parameter estimate is multiplied by 1.) For two professors
     who received the same beauty rating, which gender tends to have the
     higher course evaluation score?
+    
+    \[\widehat{score} = `r m_bty_gen$coefficients[1]` + `r m_bty_gen$coefficients[2]` \times bty\_avg + `r m_bty_gen$coefficients[2]` \times (1)\]
+    
+    **Since we are adding `r m_bty_gen$coefficients[2]` for men, this means men will tend to have a higher course evaluation score. This is evident in the chart shown above also, where the blue line (male) is above the brown line (female).**
 
 The decision to call the indicator variable `gendermale` instead of`genderfemale`
 has no deeper meaning. R simply codes the category that comes first 
@@ -256,6 +314,13 @@ Use `?relevel` to learn more.)
     added in. How does R appear to handle categorical variables that have more 
     than two levels? Note that the rank variable has three levels: `teaching`, 
     `tenure track`, `tenured`.
+    
+    **R appears to handle categorical variabels having more than two levels by adding an additional parameter for each additional level above 2. Therefore `teaching` would yield \(\hat{B_2}=0, \hat{B_3}=0\). `tenure track` would be \(\hat{B_2}=1, \hat{B_3}=0\), and `tenured would be \(\hat{B_2}=0, \hat{B_3}=1\) **
+    
+```{r}
+m_bty_rank <- lm(score ~ bty_avg + rank, data=evals)
+summary(m_bty_rank)
+```
 
 The interpretation of the coefficients in multiple regression is slightly 
 different from that of simple regression. The estimate for `bty_avg` reflects
@@ -276,9 +341,12 @@ picture color.
     Why? *Hint:* Think about which variable would you expect to not have any 
     association with the professor score.
 
+**I would hypothesize that `language`, language of the university where they got their degree, would
+have the highest p-value.**
+
 Let's run the model...
 
-```{r m_full, eval = FALSE, tidy = FALSE}
+```{r m_full, eval = TRUE, tidy = FALSE}
 m_full <- lm(score ~ rank + ethnicity + gender + language + age + cls_perc_eval 
              + cls_students + cls_level + cls_profs + cls_credits + bty_avg 
              + pic_outfit + pic_color, data = evals)
@@ -287,8 +355,12 @@ summary(m_full)
 
 12. Check your suspicions from the previous exercise. Include the model output
     in your response.
+    
+    **It appears that cls_prof, number of professors, has the least impact on score with a p-value of 0.77806.**
 
 13. Interpret the coefficient associated with the ethnicity variable.
+
+**Holding all else equal, when ethnicity is `not minority` the score tends to increase by 0.1234929.**
 
 14. Drop the variable with the highest p-value and re-fit the model. Did the
     coefficients and significance of the other explanatory variables change?
@@ -297,26 +369,92 @@ summary(m_full)
     the model.) If not, what does this say about whether or not the dropped
     variable was collinear with the other explanatory variables?
 
+```{r m_full_less_profs, eval = TRUE, tidy = FALSE}
+m_full_less_profs <- lm(score ~ rank + ethnicity + gender + language + age + cls_perc_eval 
+             + cls_students + cls_level + cls_credits + bty_avg 
+             + pic_outfit + pic_color, data = evals)
+summary(m_full_less_profs)
+```
+
+**Coefficients and p-values changed, through only slightly, which suggests some collinearity between the `cls_profs` and other variables.**
+
 15. Using backward-selection and p-value as the selection criterion,
     determine the best model. You do not need to show all steps in your
     answer, just the output for the final model. Also, write out the linear
     model for predicting score based on the final model you settle on.
+    
+```{r m_backSel_pval, eval = TRUE, tidy = FALSE}
+m_backSel_pval <- lm(score ~ ethnicity + gender + language + age + cls_perc_eval 
+             + cls_credits + bty_avg 
+             + pic_color, data = evals)
+summary(m_backSel_pval)
+
+coeffBackSel <- coefficients(m_backSel_pval)
+```
+
+\[
+  \begin{aligned}
+  \widehat{score} = & `r coeffBackSel[1]` + `r coeffBackSel[2]` \text{ ethnicity}_{not minority} + `r coeffBackSel[3]`  \text{ gender}_{male} + \\ 
+  & `r coeffBackSel[4]` \text{ language}_{non-english} + `r coeffBackSel[5]` \text{ age} + `r coeffBackSel[6]` \text{ cls\_perc\_eval } + \\ 
+  & `r coeffBackSel[7]` \text{ cls\_credits}_{one credit} + `r coeffBackSel[8]`  \text{ bty\_avg} + `r coeffBackSel[9]` \text{ pic\_color}_{color}\end{aligned}
+\]
 
 16. Verify that the conditions for this model are reasonable using diagnostic 
     plots.
+    
+**Normalness appears fine:**
+
+```{r, echo=FALSE}
+qqnorm(m_backSel_pval$residuals)
+qqline(m_backSel_pval$residuals) 
+```
+
+**The constant variability of residuals is checked via a comparison to the fitted values. As shown in the following visualization, the data appears to satisfy the conditions for regression.**
+
+```{r, echo=FALSE}
+dfResVsFit <- data.frame(residuals=abs(residuals(m_backSel_pval)), fittedValue=fitted(m_backSel_pval))
+g7b <- ggplot(data=dfResVsFit) +
+  geom_point(aes(x=fittedValue, y=residuals)) + 
+  myTheme + 
+  labs(title="Residuals vs Fitted Values")
+g7b
+```
+
 
 17. The original paper describes how these data were gathered by taking a
     sample of professors from the University of Texas at Austin and including 
     all courses that they have taught. Considering that each row represents a 
     course, could this new information have an impact on any of the conditions 
     of linear regression?
+    
+    **The new information (all courses they have taught) would introduce bias toward professors who have been at the universtiy longer whom would be represented more in sample.**
 
 18. Based on your final model, describe the characteristics of a professor and 
     course at University of Texas at Austin that would be associated with a high
     evaluation score.
+    
+```{r}
+#summary(evals)
+# Characteristics of a high scoring professor
+vHigh <- c(1,     # Intercept
+           1,     # Ethnicity: Non minority
+           1,     # Gender: Male
+           0,     # Language: Non-english
+           29,    # Age 
+           100,   # Percent of Class Evaluations 
+           1,     # Credits: One Credit
+           8.167, # Average Beauty Score
+           0)     # Pic Color: Color
+# Compute predicted score
+score <- coefficients(m_backSel_pval) %*% vHigh
+# Exceeds the maximum
+score
+```
 
 19. Would you be comfortable generalizing your conclusions to apply to professors
     generally (at any university)? Why or why not?
+    
+    **I would not be comfortable generalizing these conclusions to professors at other univesities, but could be used more generally at the University of Texas Austin. The population being sampled is specifically the UoTA professors. Inorder to generalize to any university, we would need to sample from all unversities in some way and would likely include a geographic factor in the model as well.**
 
 <div id="license">
 This is a product of OpenIntro that is released under a [Creative Commons Attribution-ShareAlike 3.0 Unported](http://creativecommons.org/licenses/by-sa/3.0). This lab was written by 
