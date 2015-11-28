@@ -1,6 +1,6 @@
 ---
-title: "IS606 Final Project"
-subtitle: "United States and Science Values"
+title: "United States and Science Values 2006 - 2011"
+subtitle: "IS606 Final Project"
 author: "Daniel Dittenhafer"
 date: "December 7, 2015"
 output: 
@@ -28,6 +28,7 @@ library(knitcitations)
 library(RefManageR)
 library(ggplot2)
 library(grid)
+library(gridExtra)
 cleanbib()
 cite_options(style="markdown")
 
@@ -76,7 +77,7 @@ myTheme <- theme(axis.ticks=element_blank(),
 
 ### Part 1 - Introduction:
 
-How have the values of people from the United States changed over time with regard to science and technology and its positive/negative impact on the world? The World Values Survey includes a question where in the survey respondent is asked to characterize their view of science and state of the world because of it `r citep(bibWorldValSurvey)`. Using the World Values Survey longitudinal data from 2006 and 2011, this project investigates changes in the views of United States respondents associated with science as well as correlations with educational level and/or the importance of religion.
+How have the values of people from the United States changed over time with regard to science and technology and its positive/negative impact on the world? The World Values Survey includes a question where in the survey respondent is asked to characterize their view of science and the state of the world because of it `r citep(bibWorldValSurvey)`. Using the World Values Survey longitudinal data from 2006 and 2011, this project investigates changes in the views of United States respondents associated with science as well as correlations with educational level and/or the importance of religion.
 
 
 ### Part 2 - Data:
@@ -306,6 +307,8 @@ g6 <- ggplot(data = df2, aes(x = xq, y = KeyQuestion)) +
 g6
 ```
 
+#### Age
+
 In the following charts we see the age distribution of respondents to the science question. Both years are somewhat normally distributed but with a right skew. Older people are less represented in the data particularlly over the age of 75. Obviously we have more responses in 2011 (which matches the Response by Year result seen earlier).
 
 ```{r, data-distrib-age, echo=FALSE, message=FALSE, fig.width=6}
@@ -317,6 +320,20 @@ g4 <- ggplot(data=WVS_US_0611_pos) +
 g4
 ```
 
+#### Education Level
+
+Now lets explore the education level of the science values respondents. Recall that the highest level in this survey is 8 - "University with degree/Higher education - upper-level tertiary certificate"", and -3 = "Not applicable; No formal education".
+
+```{r, data-distrib-highestEd, echo=FALSE, message=FALSE, fig.width=6}
+g4 <- ggplot(data=WVS_US_0611_pos) + 
+  geom_histogram(aes(x=HighestEducation)) +
+  facet_wrap(~ Year) +
+  myTheme +
+  labs(title="Education Level Distribution of Science Values Responses")
+g4
+```
+
+The distributions shown in the previous charts raise some questions. Did the education level distribution change that much in 5 years? What bias's might be introduced with these education levels? Unfortunately, these questions are out of scope for this data project. 
 
 ### Part 4 - Inference:
 
@@ -376,10 +393,90 @@ pVal <- pt(tScore, df=degFdm)
 
 \[T = \frac{`r ptEst` - 0}{`r se`} = `r tScore`\]
 
-Using degrees of freedom  based on the smaller of \(n_{2006} - 1 = `r n06 - 1`\) vs \(n_{2011} - 1 = `r n11 - 1`\): df=`r degFdm` we get a p-value \(\approx `r round(pVal, 4)` < 0.05\). Therefore, I reject the null hypothesis and conclude that the United States' mean view of the world being better off because of science and technology has increased from 2006 to 2011.
+Using degrees of freedom  based on the smaller of \(n_{2006} - 1 = `r n06 - 1`\) vs \(n_{2011} - 1 = `r n11 - 1`\): df=`r degFdm` we get a p-value \(\approx `r round(pVal, 4)` < 0.05\). Therefore, we reject the null hypothesis and conclude that the United States' mean view of the world being better off because of science and technology has increased from 2006 to 2011.
 
+We can construct a 95% confidence interval around the response variable's means and visualize it to get sense of the change and the range of probable population values.
 
+```{r, echo=FALSE}
+# Lookup t-value for our 95% CI
+tStar06 <- qt(0.975, df=n06 - 1)
+# Compute Standard Error of estimate
+se06 <- sd06 / (sqrt(n06))
+# Compute margin of error for CI
+me06 <- tStar06 * se06
+# Compute lower and upper bounds of CI.
+lb06 <- mn06 - me06
+ub06 <- mn06 + me06
 
+tStar11 <- qt(0.975, df=n11 - 1)
+se11 <- sd11 / (sqrt(n11))
+me11 <- tStar11 * se11
+lb11 <- mn11 - me11
+ub11 <- mn11 + me11
+
+dfYrMnSd0611 <- cbind(dfYrMnSd0611, data.frame(LowerBound=c(lb06, lb11), 
+                                               UpperBound=c(ub06, ub11)))
+```
+
+```{r, echo=FALSE, asis=TRUE}
+kable(dfYrMnSd0611, format="markdown")
+```
+
+```{r, echo=FALSE}
+g7 <- ggplot(data=dfYrMnSd0611) + 
+  geom_line(aes(x=Year, y=Mean), colour="lightblue") + 
+  geom_errorbar(aes(x=Year, ymin=LowerBound, ymax=UpperBound), width=0.50) +
+  ylim(5, 10) +
+  labs(title="95% Confidence Interval for United States Science Values") +
+  myTheme
+
+g7
+```
+
+Now lets focus on what factors might be related to the belief that science is making the world better off. We'll start out looking at education level through a simple scatter plot. As can be seen in both the combined and per year plots, there doesn't appear to be any dominate relationship. 
+
+```{r, echo=FALSE, fig.width=6}
+g8 <- ggplot(data=WVS_US_0611_pos) + 
+  geom_point(aes(x=HighestEducation, y=KeyQuestion), position="jitter", alpha=0.1) +
+  facet_wrap(~ Year) +
+  myTheme +
+  labs(title="Education Level vs Science Values")
+g8
+```
+
+```{r, echo=FALSE}
+dfEdFactorStats <- plyr::ddply(WVS_US_0611_pos, .(HighestEducation, Year), summarize, 
+            meanResponse=mean(KeyQuestion), 
+            sdResponse=sd(KeyQuestion))
+```
+
+When viewing the the response variable mean by educational level, it appears there is a positive relationship. 
+
+```{r, echo=FALSE, fig.width=6}
+g9 <- ggplot(data=dfEdFactorStats) + 
+  geom_line(aes(x=HighestEducation, y=meanResponse, colour=Year)) +
+  facet_wrap(~ Year) +
+  myTheme
+g9
+```
+
+Our hypotheses for an analysis of variance (ANOVA) test are as follows:
+
+\(H_0: \mu_1 = \mu_2 = \mu_3 = \mu_4 = \mu_5 = \mu_6 = \mu_7 = \mu_8, \text {The mean science values response is the same across all education levels.}\)
+
+\(H_a: \text {At least one mean is different.}\)
+
+```{r}
+aov_ed_sci <- aov(KeyQuestion ~ HighestEducation, data=WVS_US_0611_pos)
+summary(aov_ed_sci)
+```
+
+```{r}
+dfEdFactorStats
+
+m_sci_ed <- lm(HighestEducation ~ KeyQuestion, WVS_US_0611_pos)
+summary(m_sci_ed)
+```
 
 ### Part 5 - Conclusion: 
 
