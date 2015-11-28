@@ -3,7 +3,10 @@ title: "IS606 Final Project"
 subtitle: "United States and Science Values"
 author: "Daniel Dittenhafer"
 date: "December 7, 2015"
-output: pdf_document
+output: 
+  pdf_document:
+   fig_height: 3.25
+   fig_width: 4.5
 ---
 ```{r include=FALSE, cache=FALSE}
 # DO NOT REMOVE
@@ -15,7 +18,7 @@ library(knitr)
 opts_chunk$set(fig.path='figure/manual-', cache.path='cache/manual-', fig.show='hold', par=TRUE)
 ## tune details of base graphics (http://yihui.name/knitr/hooks)
 knit_hooks$set(par=function(before, options, envir){
-if (before && options$fig.show!='none') par(mar=c(4,4,.2,.1),cex.lab=.95,cex.axis=.9,mgp=c(2,.7,0),tcl=-.3)
+#if (before && options$fig.show!='none') par(mar=c(4,4,.2,.1),cex.lab=.95,cex.axis=.9,mgp=c(2,.7,0),tcl=-.3)
 })
 ```
 
@@ -24,6 +27,7 @@ library(plyr)
 library(knitcitations)
 library(RefManageR)
 library(ggplot2)
+library(grid)
 cleanbib()
 cite_options(style="markdown")
 
@@ -48,8 +52,21 @@ bibPewViewsOnScience <- bibentry(bibtype="Misc",
                                  year=2015,
                               url="http://www.pewinternet.org/2015/01/29/public-and-scientists-views-on-science-and-society/")
 
+bibCensusPopEst06 <- bibentry(bibtype="Misc",
+                            author=person(family="United States Census Bureau"),
+                            title="Annual Population Estimates 2000 - 2006",
+                            year=2006,
+                            url="http://www.census.gov/popest/data/state/totals/2006/tables/NST-EST2006-01.csv")
+
+bibCensusPopEst11 <- bibentry(bibtype="Misc",
+                            author=person(family="United States Census Bureau"),
+                            title="Annual Population Estimates",
+                            year=2011,
+                            url="http://www.census.gov/popest/data/state/totals/2011/tables/NST-EST2011-01.csv")
+
 # My ggplot theme
-myTheme <- theme(axis.ticks=element_blank(),  
+myTheme <- theme(axis.ticks=element_blank(),
+                 axis.title=element_text(size="10"),
                   panel.border = element_rect(color="gray", fill=NA), 
                   panel.background=element_rect(fill="#FBFBFB"), 
                   panel.grid.major.y=element_line(color="white", size=0.5), 
@@ -97,7 +114,7 @@ The following table lists the variables extracted from the original World Values
 
 The response variable is the answer provided to the key question, "Is the world is better off, or worse off, because of science and technology?"
 
-The answers are categorical in nature, but ordinal in their degree of support for the better/worse outcome. The distinct answer values and the description of each value are shown in the table below.
+The answers are categorical in nature, but ordinal in their degree of support for the better/worse outcome. The distinct answer values and the description of each value are shown in the table below. Note that negative values are variations on missing data. These will be eliminated during the exploratory data phase.
 
 Value | Description
 ------|------------
@@ -188,22 +205,55 @@ Let us explore the variables within the data subset. First, some simple summary 
 summary(WVS_US)
 ```
 
-The following `R` output shows the mean and standard deviation of the response variable for the various years for which the survey was conducted. Unfortunately, in 1995 and 1999 the question regarding science was not asked as evidenced by the mean of -4 and standard deviation of 0. As a result, the focus will be on differences between 2006 and 2011.
+The following table shows the mean and standard deviation of the response variable for the various years for which the survey was conducted. Unfortunately, in 1995 and 1999 the question regarding science was not asked as evidenced by the mean of -4 ("Not asked in survey") and standard deviation of 0 (no variation). As a result, the focus will be on differences between 2006 and 2011.
 
 ```{r data-year-subset, echo=FALSE}
-plyr::ddply(WVS_US, .(Year), summarize, 
+dfYrMnSd <- plyr::ddply(WVS_US, .(Year), summarize, 
             meanResponse=mean(KeyQuestion), 
             sdResponse=sd(KeyQuestion))
-
-WVS_US_0611 <- WVS_US[WVS_US$Year > 1999,]
-
-dfYearDist <- plyr::count(WVS_US_0611, "Year")
-pc06 <- dfYearDist[dfYearDist$Year == "2006", "freq"]
-pc11 <- dfYearDist[dfYearDist$Year == "2011", "freq"]
-nrow0611 <- nrow(WVS_US_0611)
+colnames(dfYrMnSd) <- c("Year", "Mean", "Std Dev")
 ```
 
-After eliminating the 1995 and 1999 data rows, `r nrow(WVS_US_0611)` cases remain. Of those, `r round(pc06 / nrow0611, 2) * 100`% are in 2006, and `r round(pc11 / nrow0611, 2) * 100` are in 2011.
+```{r, asis=TRUE, echo=FALSE}
+kable(dfYrMnSd, format="markdown")
+```
+
+```{r, echo=FALSE}
+# Subset to the years we are working with.
+WVS_US_0611 <- WVS_US[WVS_US$Year > 1999,]
+WVS_US_06 <- WVS_US_0611[WVS_US_0611$Year == 2006,]
+WVS_US_11 <- WVS_US_0611[WVS_US_0611$Year == 2011,]
+# What is response case distribution by year?
+dfYearDist <- plyr::count(WVS_US_0611, "Year")
+nrow0611 <- nrow(WVS_US_0611)
+c06 <- dfYearDist[dfYearDist$Year == "2006", "freq"]
+pc06 <- c06 / nrow0611 * 100
+
+c11 <- dfYearDist[dfYearDist$Year == "2011", "freq"]
+pc11 <- c11 / nrow0611 * 100
+
+# How many are negative values in 2006?
+df06AnswerDist <- plyr::count(WVS_US_06, "KeyQuestion")
+cNeg06 <- sum(df06AnswerDist[df06AnswerDist$KeyQuestion < 0, "freq"])
+nrow06 <- nrow(WVS_US_06)
+pcNeg06 <- cNeg06 / nrow06 * 100
+#df06AnswerDist
+
+# How many are negative values in 2011?
+df11AnswerDist <- plyr::count(WVS_US_11, "KeyQuestion")
+cNeg11 <- sum(df11AnswerDist[df11AnswerDist$KeyQuestion < 0, "freq"])
+nrow11 <- nrow(WVS_US_11)
+pcNeg11 <- cNeg11 / nrow11 * 100
+#df11AnswerDist
+
+dfCases <- data.frame(Year=c(2006, 2011, "Total"), Cases=c(c06, c11, sum(c06, c11)), Ratio=c(pc06, pc11, sum(pc06, pc11)))
+```
+
+After eliminating the 1995 and 1999 data rows, `r nrow(WVS_US_0611)` cases remain. Of those, `r round(pc06, 2)`% are in 2006, and `r round(pc11, 2)`% are in 2011. The number of cases in the sample is less than 10% of the United States population in 2006  299,398,484 `r citep(bibCensusPopEst06)`. The same holds true for the 2011 population at 311,591,917 `r citep(bibCensusPopEst11)`.
+
+```{r, asis=TRUE, echo=FALSE}
+kable(dfCases, format="markdown")
+```
 
 ```{r, data-distrib-year, echo=FALSE, message=FALSE}
 g1 <- ggplot(data=WVS_US_0611) + 
@@ -213,7 +263,122 @@ g1 <- ggplot(data=WVS_US_0611) +
 g1
 ```
 
+When viewing the data distribution of answer values for our `KeyQuestion` in each year, we see different distributions, as shown in the following Science Values Response Distribution histograms. Both years are skewed left, but 2006 appears a bit more normal where 2011 could be characterized as bi-modal at values 8 and 10. We see also that ~`r round(pcNeg06, 2)`% of 2006 answers and ~`r round(pcNeg11, 2)`%  of 2011 answers are negative and constitute missing values. These data rows will be removed shortly.
+
+```{r, data-distrib-science, echo=FALSE, message=FALSE, fig.width=6}
+g2 <- ggplot(data=WVS_US_0611) + 
+  geom_histogram(aes(x=KeyQuestion), binwidth=1) +
+  myTheme +
+  facet_wrap(~ Year) +
+  labs(title="Science Values Response Distribution")
+g2
+```
+
+```{r, echo=FALSE}
+# Subset to remove the missing/unknown values
+WVS_US_0611_pos <- WVS_US_0611[WVS_US_0611$KeyQuestion > -1, ]
+#WVS_US_06_pos <- WVS_US_0611_pos[WVS_US_0611_pos$Year == 2006, ]
+#WVS_US_11_pos <- WVS_US_0611_pos[WVS_US_0611_pos$Year == 2011, ]
+```
+
+The missing/unknown response data rows have now been removed and we further explore the data. A [Quartile-Quartile plot](http://www.itl.nist.gov/div898/handbook/eda/section3/qqplot.htm) will be used to check the normalness of these distributions in more detail. As shown in the following charts, the distributions are not strictly normal, but for our purposes we will accept them as nearly normal. This allows us to proceed with the difference of two means analysis in Part 4 - Inference. 
+
+```{r, echo=FALSE, fig.width=6, warning=FALSE}
+# From http://stackoverflow.com/questions/19599745/qqline-in-ggplot2-with-facets?lq=1
+#
+# calculate the normal theoretical quantiles per group
+df2 <- ddply(.data = WVS_US_0611_pos, .variables = .(Year), function(dat){
+             q <- qqnorm(dat$KeyQuestion, plot = FALSE)
+             dat$xq <- q$x
+             dat
+}
+)
+
+# plot the sample values against the theoretical quantiles
+g6 <- ggplot(data = df2, aes(x = xq, y = KeyQuestion)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  xlab("Theoretical") +
+  ylab("Sample") +
+  facet_wrap(~ Year) + 
+  ylim(0, 10) + 
+  myTheme
+g6
+```
+
+In the following charts we see the age distribution of respondents to the science question. Both years are somewhat normally distributed but with a right skew. Older people are less represented in the data particularlly over the age of 75. Obviously we have more responses in 2011 (which matches the Response by Year result seen earlier).
+
+```{r, data-distrib-age, echo=FALSE, message=FALSE, fig.width=6}
+g4 <- ggplot(data=WVS_US_0611_pos) + 
+  geom_histogram(aes(x=Age)) +
+  facet_wrap(~ Year) +
+  myTheme +
+  labs(title="Age Distribution of Science Values Responses")
+g4
+```
+
+
 ### Part 4 - Inference:
+
+Our initial interest relates to differences between years for the response variable. Is there a statistically significant difference between 2006 and 2011 for the response to the science and the world question? 
+
+```{r data-year-subset_pos, echo=FALSE}
+dfYrMnSd0611 <- plyr::ddply(WVS_US_0611_pos, .(Year), summarize, 
+            meanResponse=mean(KeyQuestion), 
+            sdResponse=sd(KeyQuestion),
+            nResponse=length(KeyQuestion))
+colnames(dfYrMnSd0611) <- c("Year", "Mean", "Std Dev", "n")
+```
+
+The following table lists the mean and standard deviation for our cleansed data set per our exploratory data analysis (Part 3).
+
+```{r, asis=TRUE, echo=FALSE}
+kable(dfYrMnSd0611, format="markdown")
+```
+
+```{r, echo=FALSE}
+mn06 <- dfYrMnSd0611[dfYrMnSd0611$Year == 2006, "Mean"]
+sd06 <- dfYrMnSd0611[dfYrMnSd0611$Year == 2006, "Std Dev"]
+n06  <- dfYrMnSd0611[dfYrMnSd0611$Year == 2006, "n"] 
+
+mn11 <- dfYrMnSd0611[dfYrMnSd0611$Year == 2011, "Mean"]
+sd11 <- dfYrMnSd0611[dfYrMnSd0611$Year == 2011, "Std Dev"]
+n11  <- dfYrMnSd0611[dfYrMnSd0611$Year == 2011, "n"] 
+
+ptEst <- mn06 - mn11
+se <- sqrt((sd06^2 / n06) + (sd11^2 / n11))
+degFdm <- n06 - 1
+
+```
+
+Our hypothesis test is set up as follows:
+
+\(H_0: \mu_{2006} - \mu_{2011} = 0\)
+
+\(H_a: \mu_{2006} - \mu_{2011} \ne 0\)
+
+\(\alpha = 0.05\)
+
+The point estimate for the difference in means is `r ptEst`. 
+
+\[\bar{x}_{2006} - \bar{x}_{2011} = `r ptEst`\]
+
+The standard error of the point estimate becomes:
+
+\[SE_{\bar{x}_{2011} - \bar{x}_{2006}} = \sqrt{\frac{\sigma^2_{2011}}{n_{2011}} + \frac{\sigma^2_{2006}}{n_{2006}}}=`r se`\]
+
+The T-score is computed as:
+
+```{r, echo=FALSE}
+tScore <- (ptEst - 0) / se
+pVal <- pt(tScore, df=degFdm)
+```
+
+\[T = \frac{`r ptEst` - 0}{`r se`} = `r tScore`\]
+
+Using degrees of freedom  based on the smaller of \(n_{2006} - 1 = `r n06 - 1`\) vs \(n_{2011} - 1 = `r n11 - 1`\): df=`r degFdm` we get a p-value \(\approx `r round(pVal, 4)` < 0.05\). Therefore, I reject the null hypothesis and conclude that the United States' mean view of the world being better off because of science and technology has increased from 2006 to 2011.
+
+
 
 
 ### Part 5 - Conclusion: 
