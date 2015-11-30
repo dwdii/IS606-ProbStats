@@ -447,7 +447,8 @@ g8
 ```{r, echo=FALSE}
 dfEdFactorStats <- plyr::ddply(WVS_US_0611_pos, .(HighestEducation, Year), summarize, 
             meanResponse=mean(KeyQuestion), 
-            sdResponse=sd(KeyQuestion))
+            sdResponse=sd(KeyQuestion),
+            nResponse=length(KeyQuestion))
 ```
 
 What if we summarize the response variable by the education level as in the table below? When visualizing these means by educational level, there does appear to be a positive relationship. 
@@ -465,7 +466,7 @@ g9 <- ggplot(data=dfEdFactorStats) +
 g9
 ```
 
-Our hypotheses for an analysis of variance (ANOVA) test as to whether the means for each education level are the same or different are as follows:
+Our hypotheses for an analysis of variance (ANOVA) test as to whether the means for each education level are the same or different for a given year are as follows:
 
 \(H_0: \mu_1 = \mu_2 = \mu_3 = \mu_4 = \mu_5 = \mu_6 = \mu_7 = \mu_8 \text{ (The mean science values response is the same across all education levels.)}\)
 
@@ -477,27 +478,120 @@ First we will start with the 2006 data. The ANOVA results follow:
 
 ```{r, echo=FALSE}
 WVS_US_06_pos <- WVS_US_0611_pos[WVS_US_0611_pos$Year == 2006, ]
+
+# The first argument is always the dependent variable (Alertness ).
+# It is followed by the tilde symbol (~) and the 
+# independent variable(s).
+# See also: http://www.personality-project.org/r/r.anova.html
+aov_ed_sci06 <- aov(KeyQuestion ~ HighestEducation, data=WVS_US_06_pos)
+aov_ed_sci06_summary <- summary(aov_ed_sci06)
+aov_ed_sci06_summary
+
+aovPval06 <- aov_ed_sci06_summary[[1]]$'Pr(>F)'[1]
+aovFstat06 <- aov_ed_sci06_summary[[1]]$'F value'[1]
+```
+
+Based on the F statistic for `HighestEducation`, `r round(aovFstat06, 2)`, and the p-value \(\approx `r round(aovPval06, 4)` < 0.05\), we reject the null hypothesis and conclude the response means are not the same across education levels for 2006.
+
+Next, the 2011 data ANOVA results:
+
+```{r, echo=FALSE}
 WVS_US_11_pos <- WVS_US_0611_pos[WVS_US_0611_pos$Year == 2011, ]
 
 # The first argument is always the dependent variable (Alertness ).
 # It is followed by the tilde symbol (~) and the 
 # independent variable(s).
 # See also: http://www.personality-project.org/r/r.anova.html
-aov_ed_sci <- aov(KeyQuestion ~ HighestEducation, data=WVS_US_06_pos)
-aov_ed_sci_summary <- summary(aov_ed_sci)
-aov_ed_sci_summary
+aov_ed_sci11 <- aov(KeyQuestion ~ HighestEducation, data=WVS_US_11_pos)
+aov_ed_sci11_summary <- summary(aov_ed_sci11)
+aov_ed_sci11_summary
 
-aovPval06 <- aov_ed_sci_summary[[1]]$'Pr(>F)'[1]
-aovFstat06 <- aov_ed_sci_summary[[1]]$'F value'[1]
+aovPval11 <- aov_ed_sci11_summary[[1]]$'Pr(>F)'[1]
+aovFstat11 <- aov_ed_sci11_summary[[1]]$'F value'[1]
 ```
 
-Based on the F statistic for `HighestEducation`, `r round(aovFstat06, 2)`, and the p-value \(\approx `r round(aovPval06, 4)` < 0.05\), we reject the null hypothesis and conclude the response means are not the same across education levels for 2006.
+Based on the F statistic for `HighestEducation`, `r round(aovFstat11, 2)`, and the p-value \(\approx `r round(aovPval11, 4)` < 0.05\), we reject the null hypothesis and conclude the response means are not the same across education levels for 2011 either.
 
+An extension of these results would be to perform a multiple conparisions test on each of the education level response means. For the time being, we will defer this, and instead look at differences at each education level across years.
 
+The 2006 education levels range from 2 - 8, *Completed (compulsory) elementary education* through *University with degree/Higher education - upper-level tertiary certificate*, while the 2011 education levels start at 1, but skip 3 and 4. For the levels in common between the years, 2 & 5-8, we will analyze the difference in means to uncover true differences or whether the differences might occur as a result of chance.
 
+```{r, echo=FALSE}
+dfEdFactorStatsCmn <- dfEdFactorStats[dfEdFactorStats$HighestEducation %in% c(2,5,6,7,8),]
+```
 
+The reduced education level response means are shown in the data below.
+
+```{r, echo=FALSE}
+kable(dfEdFactorStatsCmn)
+```
+
+Our generalized hypothesis test is set up as follows, where \(i\) is the educational level:
+
+\(H_0: \mu_{i,2006} - \mu_{i,2011} = 0\)
+
+\(H_a: \mu_{i,2006} - \mu_{i,2011} \ne 0\)
+
+\(\alpha = 0.05\)
+
+We will do this hypothesis test following the same process as we used for the mean science response test above, but applied enmasse to the education levels using our statistical software. The results are shown below.
+
+```{r, echo=FALSE}
+# Extract 2011 and 2006 data so we can join them to make a flat 
+# table which will help us with the mass difference in means test
+colsToExtract <- c("HighestEducation", "meanResponse", "sdResponse", "nResponse")
+cmn11 <- dfEdFactorStatsCmn[dfEdFactorStatsCmn$Year == 2011, colsToExtract]
+colnames(cmn11) <- c("HighestEducation", "Mean11", "Stdev11", "n11")
+cmn06 <- dfEdFactorStatsCmn[dfEdFactorStatsCmn$Year == 2006, colsToExtract]
+colnames(cmn06) <- c("HighestEducation", "Mean06", "Stdev06", "n06")
+cmnflat0611 <- join(cmn06, cmn11, by=c("HighestEducation"))
+
+# The steps for the difference in means hypothesis test
+#
+# Diff of Means
+cmnflat0611$DiffMean <- cmnflat0611$Mean06 - cmnflat0611$Mean11
+# Standard Error
+cmnflat0611$StdErr <- sqrt((cmnflat0611$Stdev06^2 / cmnflat0611$n06) + 
+                           (cmnflat0611$Stdev11^2 / cmnflat0611$n11))
+# T Score
+cmnflat0611$Tscore <- (cmnflat0611$DiffMean - 0) / cmnflat0611$StdErr
+# Degrees of Freedom
+cmnflat0611$DegFdm <- pmin(cmnflat0611$n06 - 1, cmnflat0611$n11 - 1)
+# P value
+cmnflat0611$Pval <- pt(cmnflat0611$Tscore, df=cmnflat0611$DegFdm)
+cmnflat0611[cmnflat0611$Tscore > 0, ]$Pval <- 1 - cmnflat0611[cmnflat0611$Tscore > 0, ]$Pval
+```
+
+```{r, echo=FALSE}
+colsToShow <- c("HighestEducation", "DiffMean", "StdErr", "Tscore", "DegFdm", "Pval")
+kable(cmnflat0611[, colsToShow])
+#kable(cmnflat0611)
+```
+
+We see some interesting results summarized in the following table. 
+
+```{r, echo=FALSE}
+dfEdLvlHyTstResuls <- data.frame(HighestEducation=c(2,5,6,7,8), 
+                                 DiffMean=cmnflat0611$DiffMean,
+                                 Pvalue=cmnflat0611$Pval, 
+                                 Conclusion=c("Reject Null Hypothesis",
+                                              "Reject Null Hypothesis",
+                                              "Reject Null Hypothesis",
+                                              "Failed to Reject Null Hypothesis",
+                                              "Failed to Reject Null Hypothesis"))
+```
+
+```{r, echo=FALSE}
+kable(dfEdLvlHyTstResuls)
+```
+
+Basically, the mean responses to the science question for education levels 2, 5 and 6 changed significantly from 2006 to 2011, while the mean responses for education levels 7 & 8 did not. Based on the sign of the Difference of Means (DiffMean), those responses in education level 2 increased their view of science and the world, whereas those in education levels 5 and 6 reduced their view of science and the world by some degree. The differences between 2006 and 2011 for eduction levels 7 & 8 could have simply been due to chance.
 
 ## Part 5 - Conclusion: 
+
+Throughout this data project, we have explored and statistically analyzed World Values Survey data related to responses from the United State regarding feelings on whether the world is better (or worse) off because of science. Statistically significant evidence showed that the population mean level related to the world being better off due to science and technology has increased from 2006 to 2011. 
+
+We have looked at how education level is related to the science/technology responses, as well as differences across different education levels. We tested and discovered that in both 2006 and 2011, the science/technology response is different among at least on of the education levels. 
 
 
 ## References:
