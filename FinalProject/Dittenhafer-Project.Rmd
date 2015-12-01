@@ -282,7 +282,7 @@ WVS_US_0611_pos <- WVS_US_0611[WVS_US_0611$KeyQuestion > -1, ]
 
 The missing/unknown response data rows have now been removed and we further explore the data. A [Quartile-Quartile plot](http://www.itl.nist.gov/div898/handbook/eda/section3/qqplot.htm) will be used to check the normalness of these distributions in more detail. As shown in the following charts, the distributions are not strictly normal, but for our purposes we will accept them as nearly normal. This allows us to proceed with the difference of two means analysis in Part 4 - Inference. 
 
-```{r, echo=FALSE, fig.width=6, warning=FALSE}
+```{r data-qqplot, echo=FALSE, fig.width=6, warning=FALSE}
 # From http://stackoverflow.com/questions/19599745/qqline-in-ggplot2-with-facets?lq=1
 #
 # calculate the normal theoretical quantiles per group
@@ -420,7 +420,7 @@ dfYrMnSd0611 <- cbind(dfYrMnSd0611, data.frame(LowerBound=c(lb06, lb11),
 kable(dfYrMnSd0611, format="markdown")
 ```
 
-```{r, echo=FALSE}
+```{r mean-ci95-scival, echo=FALSE}
 g7 <- ggplot(data=dfYrMnSd0611) + 
   geom_line(aes(x=Year, y=Mean), colour="lightblue") + 
   geom_errorbar(aes(x=Year, ymin=LowerBound, ymax=UpperBound), width=0.50) +
@@ -435,7 +435,7 @@ g7
 
 Now lets focus on what factors might be related to the belief that science is making the world better off. We'll start out looking at education level through a simple scatter plot. As can be seen in the plots, there doesn't appear to be any dominate relationship. 
 
-```{r, echo=FALSE, fig.width=6}
+```{r edlevel-vs-scival, echo=FALSE, fig.width=6}
 g8 <- ggplot(data=WVS_US_0611_pos) + 
   geom_point(aes(x=HighestEducation, y=KeyQuestion), position="jitter", alpha=0.1) +
   facet_wrap(~ Year) +
