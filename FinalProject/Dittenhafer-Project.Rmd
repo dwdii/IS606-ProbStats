@@ -93,9 +93,9 @@ Although the World Values Survey was conducted in the United States starting in 
 
 Based on the data, collection methods and type of study, we review the scope of inference this data project can claim.
 
-**Generalizability**: The population associated with the survey in this data project is the population of the United States between the ages of 18 and 85. *Is there bias, or is the data not representative of the age range?*
+**Generalizability**: The population associated with the survey in this data project is the population of the United States between the ages of 18 and 85. 
 
-**Causality**: The data is derived from an observational survey and not an experiment. As such, no causality can be established from any conclusion.
+**Causality**: The data is derived from an observational survey and not an experiment. As such, no causal relationship can be established from any conclusion.
 
 ### Variables Included in Data Subset
 
@@ -333,6 +333,20 @@ g4
 
 The distributions shown in the previous charts raise some questions. Did the education level distribution change that much in 5 years? What bias's might be introduced with these education levels? Unfortunately, these questions are out of scope for this data project. 
 
+### Importance of Religion
+
+Now lets explore the importance of religion to the science values respondents. As shown in the following charts, the distributions are visually very similar, but certainly not normally shaped. 
+
+```{r, data-distrib-religionImp, echo=FALSE, message=FALSE, fig.width=6}
+g10 <- ggplot(data=WVS_US_0611_pos) + 
+  geom_histogram(aes(x=ReligionImportant)) +
+  facet_wrap(~ Year) +
+  myTheme +
+  labs(title="Importance of Religion Distribution of Science Vales Responses")
+g10
+```
+
+
 ## Part 4 - Inference:
 
 Our initial interest relates to differences between years for the response variable. Is there a statistically significant difference between 2006 and 2011 for the response to the science and the world question? 
@@ -366,7 +380,7 @@ degFdm <- n06 - 1
 
 ```
 
-Our hypothesis test is set up as follows:
+Our hypothesis test is set up as follows. The null hypothesis states that there is now difference between the population means, whereas the alternative hypothesis is that there is a difference. 
 
 \(H_0: \mu_{2006} - \mu_{2011} = 0\)
 
@@ -433,7 +447,7 @@ g7
 
 ### Education Level Correlation 
 
-Now lets focus on what factors might be related to the belief that science is making the world better off. We'll start out looking at education level through a simple scatter plot. As can be seen in the plots, there doesn't appear to be any dominate relationship. 
+Now lets focus on what factors might be related to the belief that science is making the world better off. We'll start out looking at education level through a simple scatter plot. As can be seen in the plots, there doesn't appear to be any dominate relationship though we can see evidence of the data distribution we observed during the exploratory phase. 
 
 ```{r edlevel-vs-scival, echo=FALSE, fig.width=6}
 g8 <- ggplot(data=WVS_US_0611_pos) + 
@@ -520,7 +534,7 @@ The 2006 education levels range from 2 - 8, *Completed (compulsory) elementary e
 dfEdFactorStatsCmn <- dfEdFactorStats[dfEdFactorStats$HighestEducation %in% c(2,5,6,7,8),]
 ```
 
-The reduced education level response means are shown in the data below.
+The common education level response means are shown in the data below.
 
 ```{r, echo=FALSE}
 kable(dfEdFactorStatsCmn)
@@ -534,7 +548,7 @@ Our generalized hypothesis test is set up as follows, where \(i\) is the educati
 
 \(\alpha = 0.05\)
 
-We will do this hypothesis test following the same process as we used for the mean science response test above, but applied enmasse to the education levels using our statistical software. The results are shown below.
+We will do this hypothesis test following the same process used for the mean science response test above, but applied enmasse to the education levels using our statistical software. The results are shown below.
 
 ```{r, echo=FALSE}
 # Extract 2011 and 2006 data so we can join them to make a flat 
@@ -586,6 +600,43 @@ kable(dfEdLvlHyTstResuls)
 ```
 
 Basically, the mean responses to the science question for education levels 2, 5 and 6 changed significantly from 2006 to 2011, while the mean responses for education levels 7 & 8 did not. Based on the sign of the Difference of Means (DiffMean), those responses in education level 2 increased their view of science and the world, whereas those in education levels 5 and 6 reduced their view of science and the world by some degree. The differences between 2006 and 2011 for eduction levels 7 & 8 could have simply been due to chance.
+
+### Importance of Religion Correlation 
+
+Moving on to the importance of religion and its relationship to the science values responses. As can be seen in the plots, there doesn't appear to be any dominate relationship though we can see evidence of the data distribution we observed during the exploratory phase. 
+
+```{r edlevel-vs-relimp, echo=FALSE, fig.width=6}
+g12 <- ggplot(data=WVS_US_0611_pos) + 
+  geom_point(aes(x=ReligionImportant, y=KeyQuestion), position="jitter", alpha=0.1) +
+  facet_wrap(~ Year) +
+  myTheme +
+  labs(title="Importance of Religion vs Science Values")
+g12
+```
+
+```{r, echo=FALSE}
+dfRelFactorStats <- plyr::ddply(WVS_US_0611_pos, .(ReligionImportant, Year), summarize, 
+            meanResponse=mean(KeyQuestion), 
+            sdResponse=sd(KeyQuestion),
+            nResponse=length(KeyQuestion))
+```
+
+Lets summarize the response variable by the importance of religion, as we did with the education level. When visualizing these means, there isn't an obvious relationship, but we should perform an ANOVA test to confirm. 
+
+```{r, asis=TRUE, echo=FALSE}
+kable(dplyr::arrange(dfRelFactorStats, Year, ReligionImportant))
+```
+
+```{r mean-sci-by-relimp, echo=FALSE, fig.width=6}
+g11 <- ggplot(data=dfRelFactorStats) + 
+  geom_line(aes(x=ReligionImportant, y=meanResponse, colour=Year)) +
+  facet_wrap(~ Year) +
+  labs(title="Sample Mean Science Values Response by Importance of Religion") +
+  ylim(4.5, 8) + 
+  myTheme
+g11
+```
+
 
 ## Part 5 - Conclusion: 
 
