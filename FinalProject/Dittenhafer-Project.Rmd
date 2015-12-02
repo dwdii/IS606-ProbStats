@@ -551,29 +551,36 @@ Our generalized hypothesis test is set up as follows, where \(i\) is the educati
 We will do this hypothesis test following the same process used for the mean science response test above, but applied enmasse to the education levels using our statistical software. The results are shown below.
 
 ```{r, echo=FALSE}
-# Extract 2011 and 2006 data so we can join them to make a flat 
-# table which will help us with the mass difference in means test
-colsToExtract <- c("HighestEducation", "meanResponse", "sdResponse", "nResponse")
-cmn11 <- dfEdFactorStatsCmn[dfEdFactorStatsCmn$Year == 2011, colsToExtract]
-colnames(cmn11) <- c("HighestEducation", "Mean11", "Stdev11", "n11")
-cmn06 <- dfEdFactorStatsCmn[dfEdFactorStatsCmn$Year == 2006, colsToExtract]
-colnames(cmn06) <- c("HighestEducation", "Mean06", "Stdev06", "n06")
-cmnflat0611 <- join(cmn06, cmn11, by=c("HighestEducation"))
+differenceOfMeansBulk <- function(data, colname)
+{
+  # Extract 2011 and 2006 data so we can join them to make a flat 
+  # table which will help us with the mass difference in means test
+  colsToExtract <- c(colname, "meanResponse", "sdResponse", "nResponse")
+  cmn11 <- data[data$Year == 2011, colsToExtract]
+  colnames(cmn11) <- c(colname, "Mean11", "Stdev11", "n11")
+  cmn06 <- data[data$Year == 2006, colsToExtract]
+  colnames(cmn06) <- c(colname, "Mean06", "Stdev06", "n06")
+  cmnflat0611 <- join(cmn06, cmn11, by=c(colname))
+  
+  # The steps for the difference in means hypothesis test
+  #
+  # Diff of Means
+  cmnflat0611$DiffMean <- cmnflat0611$Mean06 - cmnflat0611$Mean11
+  # Standard Error
+  cmnflat0611$StdErr <- sqrt((cmnflat0611$Stdev06^2 / cmnflat0611$n06) + 
+                             (cmnflat0611$Stdev11^2 / cmnflat0611$n11))
+  # T Score
+  cmnflat0611$Tscore <- (cmnflat0611$DiffMean - 0) / cmnflat0611$StdErr
+  # Degrees of Freedom
+  cmnflat0611$DegFdm <- pmin(cmnflat0611$n06 - 1, cmnflat0611$n11 - 1)
+  # P value
+  cmnflat0611$Pval <- pt(cmnflat0611$Tscore, df=cmnflat0611$DegFdm)
+  cmnflat0611[cmnflat0611$Tscore > 0, ]$Pval <- 1 - cmnflat0611[cmnflat0611$Tscore > 0, ]$Pval
+  
+  return (cmnflat0611)
+}
 
-# The steps for the difference in means hypothesis test
-#
-# Diff of Means
-cmnflat0611$DiffMean <- cmnflat0611$Mean06 - cmnflat0611$Mean11
-# Standard Error
-cmnflat0611$StdErr <- sqrt((cmnflat0611$Stdev06^2 / cmnflat0611$n06) + 
-                           (cmnflat0611$Stdev11^2 / cmnflat0611$n11))
-# T Score
-cmnflat0611$Tscore <- (cmnflat0611$DiffMean - 0) / cmnflat0611$StdErr
-# Degrees of Freedom
-cmnflat0611$DegFdm <- pmin(cmnflat0611$n06 - 1, cmnflat0611$n11 - 1)
-# P value
-cmnflat0611$Pval <- pt(cmnflat0611$Tscore, df=cmnflat0611$DegFdm)
-cmnflat0611[cmnflat0611$Tscore > 0, ]$Pval <- 1 - cmnflat0611[cmnflat0611$Tscore > 0, ]$Pval
+cmnflat0611 <- differenceOfMeansBulk(dfEdFactorStatsCmn, "HighestEducation")
 ```
 
 ```{r, echo=FALSE}
@@ -601,6 +608,12 @@ kable(dfEdLvlHyTstResuls)
 
 Basically, the mean responses to the science question for education levels 2, 5 and 6 changed significantly from 2006 to 2011, while the mean responses for education levels 7 & 8 did not. Based on the sign of the Difference of Means (DiffMean), those responses in education level 2 increased their view of science and the world, whereas those in education levels 5 and 6 reduced their view of science and the world by some degree. The differences between 2006 and 2011 for eduction levels 7 & 8 could have simply been due to chance.
 
+```{r}
+corSciEd <- cor(WVS_US_0611_pos$HighestEducation, WVS_US_0611_pos$KeyQuestion)
+```
+
+Finally, if we compute the correlation coefficient for education level and science values, we find \(R=`r corSciEd`\), not a strong correlation.
+
 ### Importance of Religion Correlation 
 
 Moving on to the importance of religion and its relationship to the science values responses. As can be seen in the plots, there doesn't appear to be any dominate relationship though we can see evidence of the data distribution we observed during the exploratory phase. 
@@ -627,7 +640,7 @@ Lets summarize the response variable by the importance of religion, as we did wi
 kable(dplyr::arrange(dfRelFactorStats, Year, ReligionImportant))
 ```
 
-```{r mean-sci-by-relimp, echo=FALSE, fig.width=6}
+```{r mean-sci-by-relimp, echo=FALSE, fig.width=6, warning=FALSE}
 g11 <- ggplot(data=dfRelFactorStats) + 
   geom_line(aes(x=ReligionImportant, y=meanResponse, colour=Year)) +
   facet_wrap(~ Year) +
@@ -637,6 +650,94 @@ g11 <- ggplot(data=dfRelFactorStats) +
 g11
 ```
 
+Our hypotheses for an analysis of variance (ANOVA) test as to whether the means for each level of importance of religion are the same or different for a given year are as follows:
+
+\(H_0: \mu_1 = \mu_2 = \mu_3 = \mu_4 \text{ (The mean science values response is the same across all levels of importance of religion.)}\)
+
+\(H_a: \text {At least one mean is different.}\)
+
+\(\alpha = 0.05\)
+
+First we will start with the 2006 data. The ANOVA results follow:
+
+```{r, echo=FALSE}
+WVS_US_06_pos <- WVS_US_0611_pos[WVS_US_0611_pos$Year == 2006, ]
+
+# The first argument is always the dependent variable (Alertness ).
+# It is followed by the tilde symbol (~) and the 
+# independent variable(s).
+# See also: http://www.personality-project.org/r/r.anova.html
+aov_rel_sci06 <- aov(KeyQuestion ~ ReligionImportant, data=WVS_US_06_pos)
+aov_rel_sci06_summary <- summary(aov_rel_sci06)
+aov_rel_sci06_summary
+
+aovPval06 <- aov_rel_sci06_summary[[1]]$'Pr(>F)'[1]
+aovFstat06 <- aov_rel_sci06_summary[[1]]$'F value'[1]
+```
+
+Based on the F statistic for `ReligionImportant`, `r round(aovFstat06, 2)`, and the p-value \(\approx `r round(aovPval06, 4)` < 0.05\), we reject the null hypothesis and conclude the response means are not the same across religion importance levels for 2006.
+
+Next, the 2011 data ANOVA results:
+
+```{r, echo=FALSE}
+WVS_US_11_pos <- WVS_US_0611_pos[WVS_US_0611_pos$Year == 2011, ]
+
+# The first argument is always the dependent variable (Alertness ).
+# It is followed by the tilde symbol (~) and the 
+# independent variable(s).
+# See also: http://www.personality-project.org/r/r.anova.html
+aov_ed_sci11 <- aov(KeyQuestion ~ HighestEducation, data=WVS_US_11_pos)
+aov_ed_sci11_summary <- summary(aov_ed_sci11)
+aov_ed_sci11_summary
+
+aovPval11 <- aov_ed_sci11_summary[[1]]$'Pr(>F)'[1]
+aovFstat11 <- aov_ed_sci11_summary[[1]]$'F value'[1]
+```
+
+Based on the F statistic for `HighestEducation`, `r round(aovFstat11, 2)`, and the p-value \(\approx `r round(aovPval11, 4)` < 0.05\), we reject the null hypothesis and conclude the response means are not the same across religion importance levels for 2011 either.
+
+As with the education level, next we will look at the importance of religion and the science values question across years. Our generalized hypothesis test for the difference of means is set up as follows, where \(j\) is the level of importance of religion:
+
+\(H_0: \mu_{j,2006} - \mu_{j,2011} = 0\)
+
+\(H_a: \mu_{j,2006} - \mu_{j,2011} \ne 0\)
+
+\(\alpha = 0.05\)
+
+We will do this hypothesis test following the same process used for the mean science response test above, but again applied enmasse to the importance of religion using our statistical software. The results are shown below.
+
+```{r, echo=FALSE}
+cmnflat0611 <- differenceOfMeansBulk(dfRelFactorStats, "ReligionImportant")
+```
+
+```{r, echo=FALSE}
+colsToShow <- c("ReligionImportant", "DiffMean", "StdErr", "Tscore", "DegFdm", "Pval")
+kable(cmnflat0611[, colsToShow])
+#kable(cmnflat0611)
+```
+
+Our conclusions are summarized in the following table, but the interpretation is interesting. The population mean associated with those who rated the importance of religion at 2 or higher (2="Rather important" down to 4="Not at all important"), the feeling toward science and the world *increased* from 2006 to 2011 (the world is better off). For the population means associated with -2 and 1 (-2="No answer" and 1="Very important"), there was no conclusive change from 2006 to 2011.
+
+```{r, echo=FALSE}
+dfRelImpHyTstResuls <- data.frame(ReligionImportant=cmnflat0611$ReligionImportant, 
+                                 DiffMean=cmnflat0611$DiffMean,
+                                 Pvalue=cmnflat0611$Pval, 
+                                 Conclusion=c("Failed to Reject Null Hypothesis",
+                                              "Failed to Reject Null Hypothesis",
+                                              "Reject Null Hypothesis",
+                                              "Reject Null Hypothesis",
+                                              "Reject Null Hypothesis"))
+```
+
+```{r, echo=FALSE}
+kable(dfRelImpHyTstResuls)
+```
+
+```{r}
+corSciRel <- cor(WVS_US_0611_pos$ReligionImportant, WVS_US_0611_pos$KeyQuestion)
+```
+
+Finally, if we compute the correlation coefficient for importance of religion and science values, we find \(R=`r corSciRel`\), again not a strong correlation.
 
 ## Part 5 - Conclusion: 
 
