@@ -77,7 +77,7 @@ myTheme <- theme(axis.ticks=element_blank(),
 
 ## Part 1 - Introduction:
 
-How have the values of people from the United States changed over time with regard to science and technology and its positive/negative impact on the world? The World Values Survey includes a question where in the survey respondent is asked to characterize their view of science and the state of the world because of it `r citep(bibWorldValSurvey)`. Using the World Values Survey longitudinal data from 2006 and 2011, this project investigates changes in the views of United States respondents associated with science as well as correlations with educational level and/or the importance of religion.
+How have the values of people from the United States changed over time with regard to science and technology and its positive/negative impact on the world? The World Values Survey includes a question where in the survey respondent is asked to characterize their view of science and the state of the world because of it `r citep(bibWorldValSurvey)`. Using the World Values Survey longitudinal data from 2006 and 2011, this project investigates changes in the views of United States respondents associated with science as well as correlations with educational level and the importance of religion.
 
 
 ## Part 2 - Data:
@@ -93,7 +93,7 @@ Although the World Values Survey was conducted in the United States starting in 
 
 Based on the data, collection methods and type of study, we review the scope of inference this data project can claim.
 
-**Generalizability**: The population associated with the survey in this data project is the population of the United States between the ages of 18 and 85. 
+**Generalizability**: The population associated with the survey in this data project is the population of the United States between the ages of 18 and 85. Any results or conclusions from this project should not be generalized outside this population.
 
 **Causality**: The data is derived from an observational survey and not an experiment. As such, no causal relationship can be established from any conclusion.
 
@@ -380,7 +380,7 @@ degFdm <- n06 - 1
 
 ```
 
-Our hypothesis test is set up as follows. The null hypothesis states that there is now difference between the population means, whereas the alternative hypothesis is that there is a difference. 
+Our hypothesis test is set up as follows. The null hypothesis states that there is no difference between the population means, whereas the alternative hypothesis is that there is a difference. 
 
 \(H_0: \mu_{2006} - \mu_{2011} = 0\)
 
@@ -451,7 +451,7 @@ Now lets focus on what factors might be related to the belief that science is ma
 
 ```{r edlevel-vs-scival, echo=FALSE, fig.width=6}
 g8 <- ggplot(data=WVS_US_0611_pos) + 
-  geom_point(aes(x=HighestEducation, y=KeyQuestion), position="jitter", alpha=0.1) +
+  geom_point(aes(x=HighestEducation, y=KeyQuestion), position="jitter", alpha=0.2) +
   facet_wrap(~ Year) +
   myTheme +
   labs(title="Education Level vs Science Values")
@@ -576,6 +576,8 @@ differenceOfMeansBulk <- function(data, colname)
   # P value
   cmnflat0611$Pval <- pt(cmnflat0611$Tscore, df=cmnflat0611$DegFdm)
   cmnflat0611[cmnflat0611$Tscore > 0, ]$Pval <- 1 - cmnflat0611[cmnflat0611$Tscore > 0, ]$Pval
+  # Make it two-tailed
+  cmnflat0611$Pval <- 2 * cmnflat0611$Pval
   
   return (cmnflat0611)
 }
@@ -595,8 +597,8 @@ We see some interesting results summarized in the following table.
 dfEdLvlHyTstResuls <- data.frame(HighestEducation=c(2,5,6,7,8), 
                                  DiffMean=cmnflat0611$DiffMean,
                                  Pvalue=cmnflat0611$Pval, 
-                                 Conclusion=c("Reject Null Hypothesis",
-                                              "Reject Null Hypothesis",
+                                 Conclusion=c("Failed to Reject Null Hypothesis",
+                                              "Failed to Reject Null Hypothesis",
                                               "Reject Null Hypothesis",
                                               "Failed to Reject Null Hypothesis",
                                               "Failed to Reject Null Hypothesis"))
@@ -606,9 +608,9 @@ dfEdLvlHyTstResuls <- data.frame(HighestEducation=c(2,5,6,7,8),
 kable(dfEdLvlHyTstResuls)
 ```
 
-Basically, the mean responses to the science question for education levels 2, 5 and 6 changed significantly from 2006 to 2011, while the mean responses for education levels 7 & 8 did not. Based on the sign of the Difference of Means (DiffMean), those responses in education level 2 increased their view of science and the world, whereas those in education levels 5 and 6 reduced their view of science and the world by some degree. The differences between 2006 and 2011 for eduction levels 7 & 8 could have simply been due to chance.
+Basically, the mean responses to the science question for education level 6 changed significantly from 2006 to 2011, while the mean responses for the other education levels did not. Based on the sign of the Difference of Means (DiffMean), those responses in education level 6 reduced their view of science and the world by some degree. 
 
-```{r}
+```{r, echo=FALSE}
 corSciEd <- cor(WVS_US_0611_pos$HighestEducation, WVS_US_0611_pos$KeyQuestion)
 ```
 
@@ -620,7 +622,7 @@ Moving on to the importance of religion and its relationship to the science valu
 
 ```{r edlevel-vs-relimp, echo=FALSE, fig.width=6}
 g12 <- ggplot(data=WVS_US_0611_pos) + 
-  geom_point(aes(x=ReligionImportant, y=KeyQuestion), position="jitter", alpha=0.1) +
+  geom_point(aes(x=ReligionImportant, y=KeyQuestion), position="jitter", alpha=0.2) +
   facet_wrap(~ Year) +
   myTheme +
   labs(title="Importance of Religion vs Science Values")
@@ -716,7 +718,7 @@ kable(cmnflat0611[, colsToShow])
 #kable(cmnflat0611)
 ```
 
-Our conclusions are summarized in the following table, but the interpretation is interesting. The population mean associated with those who rated the importance of religion at 2 or higher (2="Rather important" down to 4="Not at all important"), the feeling toward science and the world *increased* from 2006 to 2011 (the world is better off). For the population means associated with -2 and 1 (-2="No answer" and 1="Very important"), there was no conclusive change from 2006 to 2011.
+Our conclusions are summarized in the following table, but the interpretation is interesting. The population mean associated with those who rated the importance of religion at 3 or higher (3="Not very important" down to 4="Not at all important"), the feeling toward science and the world *increased* from 2006 to 2011 (the world is better off). For the population means associated with -2, 1 and 2 (-2="No answer", 1="Very important" and 2="Rather important"), there was no conclusive change from 2006 to 2011.
 
 ```{r, echo=FALSE}
 dfRelImpHyTstResuls <- data.frame(ReligionImportant=cmnflat0611$ReligionImportant, 
@@ -724,7 +726,7 @@ dfRelImpHyTstResuls <- data.frame(ReligionImportant=cmnflat0611$ReligionImportan
                                  Pvalue=cmnflat0611$Pval, 
                                  Conclusion=c("Failed to Reject Null Hypothesis",
                                               "Failed to Reject Null Hypothesis",
-                                              "Reject Null Hypothesis",
+                                              "Failed to Reject Null Hypothesis",
                                               "Reject Null Hypothesis",
                                               "Reject Null Hypothesis"))
 ```
@@ -733,7 +735,7 @@ dfRelImpHyTstResuls <- data.frame(ReligionImportant=cmnflat0611$ReligionImportan
 kable(dfRelImpHyTstResuls)
 ```
 
-```{r}
+```{r, echo=FALSE}
 corSciRel <- cor(WVS_US_0611_pos$ReligionImportant, WVS_US_0611_pos$KeyQuestion)
 ```
 
@@ -741,9 +743,13 @@ Finally, if we compute the correlation coefficient for importance of religion an
 
 ## Part 5 - Conclusion: 
 
-Throughout this data project, we have explored and statistically analyzed World Values Survey data related to responses from the United State regarding feelings on whether the world is better (or worse) off because of science. Statistically significant evidence showed that the population mean level related to the world being better off due to science and technology has increased from 2006 to 2011. 
+Throughout this data project, we have explored and statistically analyzed World Values Survey data related to responses from the United State regarding feelings on whether the world is better (or worse) off because of science. Statistically significant evidence showed, with a 95% confidence level, that the population mean level related to the world being better off due to science and technology has increased by `r 7.397319 - 7.289790` to `r 7.574789 - 7.066825` from 2006 to 2011. 
 
-We have looked at how education level is related to the science/technology responses, as well as differences across different education levels. We tested and discovered that in both 2006 and 2011, the science/technology response is different among at least on of the education levels. 
+We have looked at how education level is related to the science/world responses, as well as differences across different education levels. We tested and discovered that in both 2006 and 2011, the science/workd response is different among at least one of the education levels. We also tested and concluded that only one education level, 6 - *Complete secondary: university-preparatory type/Full secondary, maturity level certificate*, had statistically significant changes in the aggregate science and the world responses, while others did not.
+
+We also looked at how the importance of religion is related to the science/world responses and found that the mean science/world response increased for thoses that reported religion as "Not at all Important" and "Not very Important".
+
+Finally, we found the correlation between the science/world response and education level to be stronger than with the importance of religion though both were fairly weak correlations.
 
 
 ## References:
@@ -753,7 +759,37 @@ BibOptions(style="html", bib.style="authortitle")
 bibliography()
 ```
 
-## Appendix (optional):
+## Appendix - Likert Visualizations:
 
-Remove this section if you don't have an appendix
+```{r, fig.width=7.5, fig.height=2, echo=FALSE, message=FALSE}
+library(likert)
+dfLikert <- data.frame(KeyQuestion=as.factor(WVS_US_0611_pos$KeyQuestion))
+lk <- likert(dfLikert, grouping=WVS_US_0611_pos$Year)
+
+plot(lk, include.histogram = TRUE)
+```
+
+```{r, fig.width=7.5, fig.height=3, echo=FALSE}
+dfLikert <- data.frame(KeyQuestion=as.factor(WVS_US_06_pos$KeyQuestion))
+lk <- likert(dfLikert, grouping=as.factor(WVS_US_06_pos$HighestEducation))
+
+plot(lk) + ggtitle("2006 Science Responses by Education Level")
+
+dfLikert <- data.frame(KeyQuestion=as.factor(WVS_US_11_pos$KeyQuestion))
+lk <- likert(dfLikert, grouping=as.factor(WVS_US_11_pos$HighestEducation))
+
+plot(lk) + ggtitle("2011 Science Responses by Education Level")
+```
+
+```{r, fig.width=7.5, fig.height=3, echo=FALSE}
+dfLikert <- data.frame(KeyQuestion=as.factor(WVS_US_06_pos$KeyQuestion))
+lk <- likert(dfLikert, grouping=as.factor(WVS_US_06_pos$ReligionImportant))
+
+plot(lk) + ggtitle("2006 Science Responses by Importance of Religion")
+
+dfLikert <- data.frame(KeyQuestion=as.factor(WVS_US_11_pos$KeyQuestion))
+lk <- likert(dfLikert, grouping=as.factor(WVS_US_11_pos$ReligionImportant))
+
+plot(lk) + ggtitle("2011 Science Responses by Importance of Religion")
+```
 
