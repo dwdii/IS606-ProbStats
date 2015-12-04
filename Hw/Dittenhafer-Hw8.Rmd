@@ -74,10 +74,10 @@ k <- 3
 varRes <- 240.57
 varOut <- 264.17
 
-R2 <- 1 - (240.57 / 264.17)
+R2 <- 1 - (varRes / varOut)
 R2
 
-adjustedR2 <- R2 * ( (n-1) / (n-k-1) )
+adjustedR2 <- 1 - (1 - R2) * ( (n-1) / (n-k-1) )
 adjustedR2
 
 ```
@@ -85,9 +85,58 @@ adjustedR2
 
 ### 8.8 Absenteeism, Part II (p399)
 
+Based on the adjusted \(R^2\)=0.0723, the learner status variable, `lrn`, should be removed first.
+
+### 8.16 Challenger disaster, Part I (p403)
+
+#### a) Each column of the table above represents a different shuttle mission. Examine these data and describe what you observe with respect to the relationship between temperatures and damaged O-rings.
+
+Observationally, I see that damaged o-rings are infrequent when temperature is greater than or equal to \(66^o\). On the other hand,  \(63^o\) and below, there is consistent damage to one or more o-rings.
+
+#### b) Failures have been coded as 1 for a damaged O-ring and 0 for an undamaged O-ring, and a logistic regression model was fit to these data. ...  Describe the key components of this summary table in words.
+
+The model summary is given below:
+
+```{r, echo=FALSE}
+dfModel <- data.frame(Estimate=c(11.6630, -0.2162), 
+                      StdError=c(3.2963, 0.0532), 
+                      zValue=c(3.54, -4.07), 
+                      PrAbsZ=c(0.0004, 0.0000))
+rownames(dfModel) <- c('Intercept', 'Temperature')
+dfModel
+```
+
+The key components are the Intercept and the Temperature values. The Estimate identifies the parameter estimate for the model. The Z value and the P-value aid with distinguishing significant parameters from less significant parameters.
+
+#### c) Write out the logistic model using the point estimates of the model parameters.
+
+\[\log_e(\frac{p_i}{1-p_i}) = 11.6630 - 0.2162 x_{temp}\]
+
+#### d) Based on the model, do you think concerns regarding O-rings are justified? Explain.
+
+First, lets look at the model probabilities graphically.
+
+```{r, echo=FALSE}
+oringModel <- function(temp)
+{
+  right <- 11.6630 - 0.2162 * temp
+  
+  prob <- exp(right) / (1 + exp(right))
+  
+  return (prob)
+}
+
+temps <- seq(32, 85)
+dfProbDamage <- data.frame(Temperature=temps, ProbDamage=oringModel(temps))
 
 
-### 8.16
+g1 <- ggplot(dfProbDamage) + geom_line(aes(x=Temperature, y=ProbDamage )) + myTheme
+g1
+```
+
+Given the high probabiliy of damage to O-rings under \(50^o\) (\(> `r round(100 * oringModel(50), 2)`\)%) according to the model and the fact that the O-rings are "Criticality 1" components, I do think concerns regarding the O-rings are justified.
+
+"Criticality 1" : meaning that there was no backup if both the primary and secondary O-rings failed, and their failure would destroy the Orbiter and kill its crew. See https://en.wikipedia.org/wiki/Space_Shuttle_Challenger_disaster.
 
 ### 8.18
 
