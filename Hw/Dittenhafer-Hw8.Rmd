@@ -114,9 +114,9 @@ The key components are the Intercept and the Temperature values. The Estimate id
 
 #### d) Based on the model, do you think concerns regarding O-rings are justified? Explain.
 
-First, lets look at the model probabilities graphically.
+First, define a function of the model:
 
-```{r, echo=FALSE}
+```{r}
 oringModel <- function(temp)
 {
   right <- 11.6630 - 0.2162 * temp
@@ -125,6 +125,12 @@ oringModel <- function(temp)
   
   return (prob)
 }
+```
+
+Now, lets look at the model probabilities graphically.
+
+```{r, echo=FALSE}
+
 
 temps <- seq(32, 85)
 dfProbDamage <- data.frame(Temperature=temps, ProbDamage=oringModel(temps))
@@ -138,7 +144,60 @@ Given the high probabiliy of damage to O-rings under \(50^o\) (\(> `r round(100 
 
 "Criticality 1" : meaning that there was no backup if both the primary and secondary O-rings failed, and their failure would destroy the Orbiter and kill its crew. See https://en.wikipedia.org/wiki/Space_Shuttle_Challenger_disaster.
 
-### 8.18
+### 8.18 Challenger disaster, Part II (p404)
+
+#### a) Use the model to calculate the probability that an O-ring will become damaged at each of the following ambient temperatures: 51, 53, 55 degrees F.
+
+```{r}
+temps <- c(51,53,55)
+dfProbDamage <- data.frame(Temperature=temps, ProbDamage=oringModel(temps))
+dfProbDamage
+```
+
+#### b) Add the model-estimated probabilities from part (a) on the plot, then connect these dots using a smooth curve to represent the model-estimated probabilities.
+
+First we define the raw data in a data.frame.
+```{r}
+dfRaw <- data.frame(Missing=seq(1, 23), 
+                    Temp=c(53,57,58,63,66,67,67,67,68,69,70,70,70,
+                           70,72,73,75,75,76,76,78,79,81),
+                    Damaged=c(5,1,1,1,0,0,0,0,0,0,1,0,1,0,0,0,0,1,0,0,0,0,0),
+                    Undamaged=c(1,5,5,5,6,6,6,6,6,6,5,6,5,6,6,6,6,5,6,6,6,6,6))
+dfRaw$ProbDamage <- dfRaw$Damaged / (dfRaw$Damaged + dfRaw$Undamaged)
+head(dfRaw)
+```
 
 
+Then we create a data.frame for the model-estimated probilibities using our predefined model.
 
+```{r}
+temps <- seq(51, 71, by=2)
+dfProbDamage <- data.frame(Temperature=temps, ProbDamage=oringModel(temps))
+```
+
+Finally, we show the visualization combining the raw data and the model curve.
+
+```{r, echo=FALSE, fig.height=3, fig.width=5}
+g1 <- ggplot(dfRaw) + 
+  geom_point(aes(x=Temp, y=ProbDamage), alpha=0.5, colour="lightblue") + 
+  geom_line(data=dfProbDamage, aes(x=Temperature, y=ProbDamage), colour="magenta") +
+  geom_point(data=dfProbDamage, aes(x=Temperature, y=ProbDamage), colour="magenta") +
+  labs(x="Temperature", y="Probability of damage") +
+  ylim(0, 1) +
+  myTheme
+g1
+```
+
+#### c) Describe any concerns you may have regarding applying logistic regression in this application, and note any assumptions that are required to accept the model's validity.
+
+As shown in the visualization above, the logistic regression is a bit slow to respond to the higher damage values. This may be due to a lack of damage data and would likely affect any model. One benefit of using logistic regression is that the probability as output is convenient and easily understood by non-statistians. 
+
+Conditions/assumptions required for logistic regression model validity include:
+
+* Each predictor \(x\), is linearly related to logit\((p_i)\) if all other predictors are help constant.
+
+Based on the visualization of the raw data, the temperature data does appear to have a linear relationship wo the probability of damage to O-rings, at least to some significant degree.
+
+* Each outcome \(Y_i\) is independent of the other outcomes.
+
+Given the concept of the damage data being associated with separate shuttle missions after complete refurbishing of the shuttle solid rocket boosters, the independence condition is met.
