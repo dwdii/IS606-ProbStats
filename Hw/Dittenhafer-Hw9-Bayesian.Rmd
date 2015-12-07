@@ -1,0 +1,71 @@
+---
+title: "IS606 Bayesian (Homework 9)"
+author: "Daniel Dittenhafer"
+date: "December 6, 2015"
+output: pdf_document
+---
+```{r, echo=FALSE} 
+library(ggplot2)
+library(knitr)
+myTheme <- theme(axis.ticks=element_blank(),  
+                  panel.border = element_rect(color="gray", fill=NA), 
+                  panel.background=element_rect(fill="#FBFBFB"), 
+                  panel.grid.major.y=element_line(color="white", size=0.5), 
+                  panel.grid.major.x=element_line(color="white", size=0.5),
+                  plot.title=element_text(size="10"))
+```
+
+### 2.1 (p31)
+
+#### Model A
+
+The following code defines a function for the Model A probabilities.
+
+```{r}
+xSeq <- seq(1, 4)
+modelA <- function(x)
+{
+  return (1 / 4)
+}
+
+dfModelA <- data.frame(x=xSeq, Px=modelA(xSeq))
+kable(dfModelA, caption="Model A Probabilities")
+```
+
+We don't see any bias in the Model A probabilities. They are all equal.
+
+#### Model B
+
+The following code defines a function for the Model B probabilities.
+
+```{r}
+modelB <- function(x)
+{
+  return (x / 10)
+}
+
+dfModelB <- data.frame(x=xSeq, Px=modelB(xSeq))
+kable(dfModelB, caption="Model B Probabilities")
+```
+
+Model B is biased toward the higher numbers. 
+
+#### Model C
+
+The following code defines a function for the Model C probabilities.
+
+```{r}
+modelC <- function(x)
+{
+  return (12 / (25 * x))
+}
+
+dfModelC <- data.frame(x=xSeq, Px=modelC(xSeq))
+kable(dfModelC, caption="Model C Probabilities")
+```
+
+Model C is biased toward the lower numbers, slightly more so than Model B was toward the higher numbers.
+
+### 5.1
+
+### 5.2
