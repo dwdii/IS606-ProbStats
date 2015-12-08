@@ -140,3 +140,28 @@ b
 
 #### c) 
 
+The following code computes the "Markov" natural frequencies and displays the table.
+
+```{r}
+nDisPresent <- 10000
+nDisAbsent <- 9990000
+dfNaturalFreq <- data.frame(ThetaSad=c(nDisPresent, 
+                                       nDisPresent * (0.99), 
+                                       (nDisPresent * (0.99)) * ((1-0.99))), 
+                            ThetaHappy=c(nDisAbsent,
+                                         nDisAbsent * (0.05),
+                                         (nDisAbsent * (0.05)) * (1-0.05)))
+kable(dfNaturalFreq)
+```
+
+#### d)
+
+What proportion of people who test positive at first and then negative on retest, actually have the disease?
+
+```{r}
+numerator <- ((nDisPresent * (0.99)) * ((1-0.99)))
+denom <- ((nDisPresent * (0.99)) * (1-0.99)) + (nDisAbsent * (0.05) * (1-0.05))
+nActuallyHaveDisease <- numerator / denom
+
+nActuallyHaveDisease
+```
