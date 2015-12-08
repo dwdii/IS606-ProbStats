@@ -113,4 +113,30 @@ format(probDisPresentGivenTestNeg, scientific = FALSE)
 
 ### 5.2 (p118)
 
+#### a) Table
+
+```{r}
+n <- 100000
+probTestNegGivenDisAbsent <- 1 - probTestPosGivenDisAbsent
+dfTable <- data.frame(ThetaSad=c(99, 1, 100), 
+                      ThetaHappy=c(probTestPosGivenDisAbsent * marginalProbDiseaseAbsent * n,
+                                   probTestNegGivenDisAbsent * marginalProbDiseaseAbsent * n,
+                                   99900), 
+                      Col3=c(NA, NA, 100000))
+dfTable$Col3 <- dfTable$ThetaSad + dfTable$ThetaHappy
+dfTable
+
+```
+
+#### b) Proportion of people who have the disease given their test result is positive
+
+It looks like about 2%. Computing:
+
+```{r}
+b <- 99 / 5094
+b
+```
+
+
+#### c) 
 
