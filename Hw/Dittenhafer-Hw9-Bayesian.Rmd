@@ -66,6 +66,51 @@ kable(dfModelC, caption="Model C Probabilities")
 
 Model C is biased toward the lower numbers, slightly more so than Model B was toward the higher numbers.
 
-### 5.1
+### 5.1 (p118)
 
-### 5.2
+The following code works throught the test for a disease and retest scenario for an individual.
+
+```{r}
+# Define marginal probabilities
+marginalProbDiseasePresent <- 0.001
+marginalProbDiseaseAbsent <- 1 - marginalProbDiseasePresent
+# Define composite probabilities
+probTestPosGivenDisPresent <- 0.99
+probTestPosGivenDisAbsent <- 0.05
+# Func of Bayes rule
+bayesRule <- function(likelihood, prior, evidence)
+{
+  return ((likelihood * prior) / sum(evidence))
+}
+```
+
+First we compute the probability of having the disease given the test is positive.
+
+```{r}
+# Denominator in component form
+evidence <- c(probTestPosGivenDisPresent * marginalProbDiseasePresent,
+              probTestPosGivenDisAbsent * marginalProbDiseaseAbsent)
+# Call function to compute probability of disease present given a positive test.
+probDisPresentGivenTestPost <- bayesRule(probTestPosGivenDisPresent, 
+                                         marginalProbDiseasePresent,
+                                         evidence)
+probDisPresentGivenTestPost
+```
+
+Now, after a re-test and a negative result, what is the probability of having the disease?
+
+```{r}
+pPrior <- probDisPresentGivenTestPost
+probTestNegGivenDisPresent <- (1 - probTestPosGivenDisPresent)
+evidence <- c(probTestNegGivenDisPresent * pPrior,
+              (1 - probTestPosGivenDisAbsent) * (1 - pPrior))
+# Call function to compute probability of disease present given a negative test.
+probDisPresentGivenTestNeg <- bayesRule(probTestNegGivenDisPresent, 
+                                         pPrior,
+                                         evidence)
+format(probDisPresentGivenTestNeg, scientific = FALSE)
+```
+
+### 5.2 (p118)
+
+
