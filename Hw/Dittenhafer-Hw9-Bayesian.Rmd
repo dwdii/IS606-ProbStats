@@ -68,7 +68,7 @@ Model C is biased toward the lower numbers, slightly more so than Model B was to
 
 ### 5.1 (p118)
 
-The following code works throught the test for a disease and retest scenario for an individual.
+The following code works through the test for a disease and retest scenario for an individual.
 
 ```{r}
 # Define marginal probabilities
