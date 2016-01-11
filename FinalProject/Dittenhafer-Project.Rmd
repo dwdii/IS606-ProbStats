@@ -407,7 +407,7 @@ pVal <- pt(tScore, df=degFdm)
 
 Using degrees of freedom  based on the smaller of \(n_{2006} - 1 = `r n06 - 1`\) vs \(n_{2011} - 1 = `r n11 - 1`\): df=`r degFdm` we get a p-value \(\approx `r round(pVal, 4)` < 0.05\). Therefore, we reject the null hypothesis and conclude that the United States' mean view of the world being better off because of science and technology has _increased_ from 2006 to 2011.
 
-We can construct a 95% confidence interval around the response variable's means and visualize it to get sense of the change and the range of probable population values.
+We can construct a 95% confidence interval around the response variable's means and visualize it to get a sense of the change and the range of probable population values.
 
 ```{r, echo=FALSE}
 # Lookup t-value for our 95% CI
@@ -445,7 +445,9 @@ g7 <- ggplot(data=dfYrMnSd0611) +
 g7
 ```
 
-### Education Level Correlation 
+The chart above helps illustrate the change in science values between 2006 and 2011. While subtle, the change is distinct and significant.
+
+### Education Level Correlation
 
 Now lets focus on what factors might be related to the belief that science is making the world better off. We'll start out looking at education level through a simple scatter plot. As can be seen in the plots, there doesn't appear to be any dominate relationship though we can see evidence of the data distribution we observed during the exploratory phase. 
 
@@ -620,7 +622,7 @@ Finally, if we compute the correlation coefficient for education level and scien
 
 Moving on to the importance of religion and its relationship to the science values responses. As can be seen in the plots, there doesn't appear to be any dominate relationship though we can see evidence of the data distribution we observed during the exploratory phase. 
 
-```{r edlevel-vs-relimp, echo=FALSE, fig.width=6}
+```{r relimp-vs-scival, echo=FALSE, fig.width=6}
 g12 <- ggplot(data=WVS_US_0611_pos) + 
   geom_point(aes(x=ReligionImportant, y=KeyQuestion), position="jitter", alpha=0.2) +
   facet_wrap(~ Year) +
@@ -688,15 +690,15 @@ WVS_US_11_pos <- WVS_US_0611_pos[WVS_US_0611_pos$Year == 2011, ]
 # It is followed by the tilde symbol (~) and the 
 # independent variable(s).
 # See also: http://www.personality-project.org/r/r.anova.html
-aov_ed_sci11 <- aov(KeyQuestion ~ HighestEducation, data=WVS_US_11_pos)
-aov_ed_sci11_summary <- summary(aov_ed_sci11)
-aov_ed_sci11_summary
+aov_rel_sci11 <- aov(KeyQuestion ~ ReligionImportant, data=WVS_US_11_pos)
+aov_rel_sci11_summary <- summary(aov_rel_sci11)
+aov_rel_sci11_summary
 
-aovPval11 <- aov_ed_sci11_summary[[1]]$'Pr(>F)'[1]
-aovFstat11 <- aov_ed_sci11_summary[[1]]$'F value'[1]
+aovPval11 <- aov_rel_sci11_summary[[1]]$'Pr(>F)'[1]
+aovFstat11 <- aov_rel_sci11_summary[[1]]$'F value'[1]
 ```
 
-Based on the F statistic for `HighestEducation`, `r round(aovFstat11, 2)`, and the p-value \(\approx `r round(aovPval11, 4)` < 0.05\), we reject the null hypothesis and conclude the response means are not the same across religion importance levels for 2011 either.
+Based on the F statistic for `ReligionImportant`, `r round(aovFstat11, 2)`, and the p-value \(\approx `r round(aovPval11, 4)` < 0.05\), we reject the null hypothesis and conclude the response means are not the same across religion importance levels for 2011 either.
 
 As with the education level, next we will look at the importance of religion and the science values question across years. Our generalized hypothesis test for the difference of means is set up as follows, where \(j\) is the level of importance of religion:
 
