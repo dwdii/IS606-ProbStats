@@ -528,7 +528,7 @@ aovFstat11 <- aov_ed_sci11_summary[[1]]$'F value'[1]
 
 Based on the F statistic for `HighestEducation`, `r round(aovFstat11, 2)`, and the p-value \(\approx `r round(aovPval11, 4)` < 0.05\), we reject the null hypothesis and conclude the response means are not the same across education levels for 2011 either.
 
-An extension of these results would be to perform a multiple conparisions test on each of the education level response means. For the time being, we will defer this, and instead look at differences at each education level across years.
+An extension of these results would be to perform a multiple comparisions test on each of the education level response means. For the time being, we will defer this, and instead look at differences at each education level across years.
 
 The 2006 education levels range from 2 - 8, *Completed (compulsory) elementary education* through *University with degree/Higher education - upper-level tertiary certificate*, while the 2011 education levels start at 1, but skip 3 and 4. For the levels in common between the years, 2 & 5-8, we will analyze the difference in means to uncover true differences or whether the differences might occur as a result of chance.
 
